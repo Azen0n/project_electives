@@ -45,61 +45,63 @@ class Student:
         return f'[id: {self.id},\tperformance: {self.performance},\tpriorities: {self.priorities}]'
 
 
-number_of_electives = 10
-min_cap = 20
-max_cap = 25
-
-# Массив с элективами: id, вместимость, список студентов (список кортежей: id студента, приоритет на этот электив)
-electives = generate_electives(number_of_electives, min_cap, max_cap)
-
-number_of_students = np.array([electives[i].capacity for i in range(number_of_electives)]).sum() - 50
-
-# Массив со студентами: id, успеваемость, список id выбранных элективов
-students = generate_students(number_of_students, number_of_electives)
-
-print(f'{electives = }\n')
-print(f'{students = }\n')
-print(f'{number_of_students = }')
-print(f'{number_of_electives = }')
-
-
 # Метрики
 # 1. Квадрат отклонения приоритета
 def squared_priority_deviation(students):
     deviation = 0
-    deviation1 = []
     for student in students:
         if student.elective_id is None:
             index = 5
         else:
             index, = np.where(student.priorities == student.elective_id)
         deviation += index ** 2
-        deviation1.append(index)
-    return deviation, deviation1
+    return deviation / len(students)
 
 
-# TODO: 2. Сумма произведения приоритета на рейтинг
-# TODO: 3. Среднее приоритета
-
-# У каждого электива список студентов, которые его выбрали: (студент, приоритет электива)
-for elective in electives:
+# 2. Среднее приоритета
+def mean_priority(students):
+    deviation = 0
     for student in students:
-        if elective.id in student.priorities:
-            elective.students.append([student, np.where(student.priorities == elective.id)[0][0] + 1])
-    # Сортировка по приоритету электива, затем по успеваемости
-    elective.students.sort(key=lambda x: (x[1], 5 - x[0].performance))
+        if student.elective_id is None:
+            index = 5
+        else:
+            index, = np.where(student.priorities == student.elective_id)
+        deviation += index
+    return deviation / len(students)
+
+
+# 3. Сумма произведения приоритета на рейтинг
+def sum_of_priority_performance_product(students):
+    deviation = 0
+    for student in students:
+        if student.elective_id is None:
+            index = 5
+        else:
+            index, = np.where(student.priorities == student.elective_id)
+        deviation += index * student.performance
+    return deviation / len(students)
+
+
+def add_priorities_to_electives(electives, students):
+    # У каждого электива список студентов, которые его выбрали: (студент, приоритет электива)
+    for elective in electives:
+        for student in students:
+            if elective.id in student.priorities:
+                elective.students.append([student, np.where(student.priorities == elective.id)[0][0] + 1])
+        # Сортировка по приоритету электива, затем по успеваемости
+        elective.students.sort(key=lambda x: (x[1], 5 - x[0].performance))
+
 
 # TODO: Переписать
-for elective in electives:
-    for student in elective.students:
-        if student[-1] == 1:
-            elective.reserve += 1
+def count_reserve(electives):
+    for elective in electives:
+        for student in elective.students:
+            if student[-1] == 1:
+                elective.reserve += 1
 
-electives = np.array(sorted(electives, key=lambda x: x.reserve, reverse=True))
-print(1)
 
-# TODO: Изменить
-min_capacity = 16
+def sort_electives_by_reserve(electives):
+    electives = np.array(sorted(electives, key=lambda x: x.reserve, reverse=True))
 
 
 def search_elective(electives, id):
@@ -110,37 +112,69 @@ def search_elective(electives, id):
         i += 1
 
 
-for elective in electives:
-    if elective.reserve < min_capacity:
+def something(electives):
+    for elective in electives:
+        if elective.reserve < min_capacity:
 
-        # student[0] — студент (есть поля id и прочее)
-        # student[1] — приоритет электива
+            # student[0] — студент (есть поля id и прочее)
+            # student[1] — приоритет электива
+            for student in elective.students:
+
+                first_priority_elective = search_elective(electives, student[0].priorities[0])
+                temp1 = student[0].priorities[0]
+
+                for i in range(2, 6):
+                    if student[1] == i and student[0].availability and electives[first_priority_elective].reserve > min_capacity:
+                        elective.reserve += 1
+                        student[0].availability = False
+                        student[0].elective_id = elective.id
+                        electives[first_priority_elective].reserve -= 1
+                        elective.result_students.append(student[0])
+
+
+def something2(electives):
+    for elective in electives:
         for student in elective.students:
-
-            first_priority_elective = search_elective(electives, student[0].priorities[0])
-            temp1 = student[0].priorities[0]
-
             for i in range(1, 6):
-                pass
+                if student[1] == i and student[0].availability and len(elective.result_students) < elective.capacity:
+                    student[0].availability = False
+                    student[0].elective_id = elective.id
+                    elective.result_students.append(student[0])
 
-            if student[1] > 1 and student[0].availability and electives[first_priority_elective].reserve > min_capacity:
-                elective.reserve += 1
-                student[0].availability = False
-                student[0].elective_id = elective.id
-                electives[first_priority_elective].reserve -= 1
-                elective.result_students.append(student[0])
 
-for elective in electives:
-    for student in elective.students:
-        for i in range(1, 6):
-            if student[1] == i and student[0].availability and len(elective.result_students) < elective.capacity:
-                student[0].availability = False
-                student[0].elective_id = elective.id
-                elective.result_students.append(student[0])
+def print_students(students):
+    for student in students:
+        if student.availability:
+            print(student)
 
-for student in students:
-    if student.availability:
-        print(student)
 
-arr = np.array(squared_priority_deviation(students)[1])
-print(arr)
+if __name__ == '__main__':
+    number_of_electives = 10
+    min_cap = 20        # Границы рандома
+    max_cap = 25
+
+    min_capacity = 16   # Минимальная вместимость электива
+
+    # Массив с элективами: id, вместимость, список студентов (список кортежей: id студента, приоритет на этот электив)
+    electives = generate_electives(number_of_electives, min_cap, max_cap)
+
+    number_of_students = np.array([electives[i].capacity for i in range(number_of_electives)]).sum() - 50
+
+    # Массив со студентами: id, успеваемость, список id выбранных элективов
+    students = generate_students(number_of_students, number_of_electives)
+
+    print(f'{electives = }\n')
+    print(f'{students = }\n')
+    print(f'{number_of_students = }')
+    print(f'{number_of_electives = }')
+
+    add_priorities_to_electives(electives, students)
+    count_reserve(electives)
+    sort_electives_by_reserve(electives)
+    something(electives)
+    something2(electives)
+    print_students(students)
+
+    print(np.array(squared_priority_deviation(students)))
+    print(np.array(mean_priority(students)))
+    print(np.array(sum_of_priority_performance_product(students)))
