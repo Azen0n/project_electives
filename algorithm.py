@@ -45,7 +45,7 @@ def search_elective(electives, id):
 
 
 def fill_elective_with_students(students, elective):
-    """Заполнение списка студентов, выбравших электив и позиция выбора."""
+    """Заполнение списка студентов, выбравших электив, с позицией выбора."""
     for student in students:
         if elective.id in student.priorities:
             elective.students.append([student, np.where(student.priorities == elective.id)[0][0] + 1])
@@ -67,7 +67,7 @@ def calculate_reserve(elective):
 
 
 def add_student_to_elective(student, elective):
-    """Добавление стдуента в финальный список электива."""
-    student[0].availability = False
-    student[0].elective_id = elective.id
+    """Добавление студента в финальный список студентов электива."""
+    student.availability = False
+    student.elective_id = elective.id
     elective.result_students.append(student)
