@@ -22,7 +22,7 @@ class Student:
         self.performance = performance
         self.priorities = priorities
         self.elective_id = None
-        self.availability = True
+        self.is_available = True
 
     def __repr__(self):
         return f'[id: {self.id},\tperformance: {self.performance},\tpriorities: {self.priorities}]'
