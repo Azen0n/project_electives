@@ -11,17 +11,15 @@ def student_allocation(electives, students, min_capacity):
 
     for elective in electives:
         if min_capacity / 2.0 <= elective.reserve < min_capacity:
-            # student[0] — студент (есть поля id и прочее)
-            # student[1] — приоритет электива
-
             for student in elective.students:
+                # student[0] — студент (есть поля id и прочее)
+                # student[1] — приоритет электива
                 if elective.reserve >= min_capacity:
                     break
-
                 first_priority_elective = search_elective(electives, student[0].priorities[0])
 
                 for i in range(2, 6):
-                    if student[1] == i and student[0].availability and electives[first_priority_elective].reserve > min_capacity and elective.reserve < min_capacity:
+                    if student[1] == i and student[0].is_available and electives[first_priority_elective].reserve > min_capacity and elective.reserve < min_capacity:
                         elective.reserve += 1
                         electives[first_priority_elective].reserve -= 1
                         add_student_to_elective(student[0], elective)
@@ -32,11 +30,12 @@ def student_allocation(electives, students, min_capacity):
     for i in range(1, 6):
         for elective in electives:
             for student in elective.students:
-                if student[1] == i and student[0].availability and len(elective.result_students) < elective.capacity:
+                if student[1] == i and student[0].is_available and len(elective.result_students) < elective.capacity:
                     add_student_to_elective(student[0], elective)
 
 
 def search_elective(electives, id):
+    """Поиск индекса электива в списке элективов."""
     i = 0
     for elective in electives:
         if elective.id == id:
@@ -68,6 +67,35 @@ def calculate_reserve(elective):
 
 def add_student_to_elective(student, elective):
     """Добавление студента в финальный список студентов электива."""
-    student.availability = False
+    student.is_available = False
     student.elective_id = elective.id
     elective.result_students.append(student)
+
+
+def transfer_graph(electives):
+    """Составление графа стоимости трансфера студентов."""
+    electives_graph = np.full((len(electives), len(electives)), 25.0)   # 25 — максимум
+    for elective in electives:
+        for student in elective.result_students:
+            for index, priority in enumerate(student.priorities):
+                if elective.id != priority:
+                    sink = np.where(student.priorities == student.elective_id)[0][0]
+                    electives_graph[elective.id - 1][priority - 1] = min((index - sink) * student.performance, electives_graph[elective.id - 1][priority - 1])
+                else:
+                    electives_graph[priority - 1][priority - 1] = 0.0
+
+    return electives_graph
+
+
+def get_remnant_students(students):
+    """Поиск нераспределенных студентов."""
+    remnant_students = []
+    for student in students:
+        if student.is_available:
+            remnant_students.append(student)
+    return np.array(remnant_students)
+
+
+def remnant_students_allocation():
+    """Распределение оставшихся (нераспределенных) студентов."""
+    pass
