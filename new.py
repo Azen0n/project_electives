@@ -9,15 +9,15 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 
 if __name__ == '__main__':
-    number_of_electives = 10
+    number_of_electives = 100
     low_capacity = 20       # Границы рандома
     high_capacity = 25
 
-    min_capacity = 16       # Минимальная вместимость электива
+    min_capacity = 10       # Минимальная вместимость электива
 
     electives = generate_electives(number_of_electives, low_capacity, high_capacity)
     number_of_students = np.array([electives[i].capacity for i in range(number_of_electives)]).sum() - 50
-    students = generate_students(number_of_students, number_of_electives)
+    students = generate_students(number_of_students, number_of_electives, 'gamma')
 
     student_allocation(electives, students, min_capacity)
 
