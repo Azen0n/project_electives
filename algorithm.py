@@ -99,3 +99,7 @@ def get_remnant_students(students):
 def remnant_students_allocation():
     """Распределение оставшихся (нераспределенных) студентов."""
     pass
+
+
+def sosat():
+    pass
