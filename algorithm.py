@@ -102,4 +102,6 @@ def remnant_students_allocation():
 
 
 def sosat():
-    pass
+    return "ass"
+
+
