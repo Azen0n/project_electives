@@ -55,8 +55,8 @@ def generate_students(number_of_students, number_of_electives, distribution):
     """Генерация массива студентов"""
 
     students_priorities = generate_students_priorities(number_of_students, number_of_electives, distribution)
-
+    """Изменён рандом на более логичный 2->3"""
     return np.array([Student(i + 1,
-                             np.round(np.random.uniform(2, 5), 2),
+                             np.round(np.random.uniform(3, 5), 2),
                              students_priorities[i])
                      for i in range(number_of_students)])
