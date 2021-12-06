@@ -9,7 +9,7 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 
 if __name__ == '__main__':
-    number_of_electives = 200
+    number_of_electives = 100
     low_capacity = 20       # Границы рандома
     high_capacity = 25
 
@@ -21,17 +21,18 @@ if __name__ == '__main__':
     start=time.time()
     student_allocation(electives, students, min_capacity)
 
-    print(f'{number_of_students = }')
-    print(f'{number_of_electives = }')
+    print('number_of_students = %s' % number_of_students)
+    print('number_of_electives = %s' % number_of_electives)
+
     print('metrics:')
     call_all_metrics(students)
-    bratki_tapki , optimal_transfer_graph=transfer_graph(electives)
-    optimal_transfer_graph, temp_graph, bratki_tapki = floyd(bratki_tapki, optimal_transfer_graph, electives, students)
+    id_graph, optimal_transfer_graph = transfer_graph(electives)
+    optimal_transfer_graph, trans_graph, id_graph = floyd(id_graph, optimal_transfer_graph, electives, students)
     end2 = time.time()
     call_all_metrics(students)
     print((end2 - start)/60)
 
-    remnant_students_allocation(optimal_transfer_graph, temp_graph, bratki_tapki, electives, students, min_capacity)
+    remnant_students_allocation(optimal_transfer_graph, trans_graph, id_graph, electives, students, min_capacity)
     call_all_metrics(students)
     end = time.time()
     print((end - start)/60)
