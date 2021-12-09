@@ -1,0 +1,50 @@
+<ElectiveLine>
+    BoxLayout:
+        id: elective_line
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: 50
+        minimum_height: self.height
+
+        Label:
+            text: ''
+            color: 0, 0, 0, 1
+            valign: 'center'
+            padding_x: 30
+
+        HoverButton:
+            text: 'Редактировать'
+            size_hint: None, None
+            size: 150, 50
+            background_normal: ''
+            background_color: 40/255, 167/255, 69/255, 255/255
+            on_press: root.edit_button_click()
+
+
+<AdministrativeMenu>
+    ScrollView:
+        size: root.width, root.height
+
+        BoxLayout:
+            id: box_layout
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+            padding: 30
+            spacing: 5
+
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 10
+                size_hint_y: None
+                height: 50
+
+                HoverButton:
+                    text: 'Статистика по прошедшим элективам'
+                    background_normal: ''
+                    background_color: 40/255, 167/255, 69/255, 255/255
+
+                HoverButton:
+                    text: 'Статистика по текущим элективам'
+                    background_normal: ''
+                    background_color: 40/255, 167/255, 69/255, 255/255
