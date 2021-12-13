@@ -1,50 +1,55 @@
 <ElectiveLine>
-    BoxLayout:
-        id: elective_line
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: 50
-        minimum_height: self.height
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: 50
+    background_color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
 
-        Label:
-            text: ''
-            color: 0, 0, 0, 1
-            valign: 'center'
-            padding_x: 30
+    Label:
+        id: elective_name_label
+        text: 'Логика'
+        color: 0, 0, 0, 1
+        text_size: self.size
+        valign: 'center'
+        padding_x: 30
 
-        HoverButton:
-            text: 'Редактировать'
-            size_hint: None, None
-            size: 150, 50
-            background_normal: ''
-            background_color: 40/255, 167/255, 69/255, 255/255
-            on_press: root.edit_button_click()
+    HoverButton:
+        text: 'Редактировать'
+        size_hint: None, None
+        size: 150, root.height
+        background_normal: ''
+        background_color: 40/255, 167/255, 69/255, 255/255
+        on_press: root.edit_button_click(self)
 
 
 <AdministrativeMenu>
-    ScrollView:
-        size: root.width, root.height
+    size: root.width, root.height
+
+    BoxLayout:
+        id: box_layout
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        padding: 30
+        spacing: 10
 
         BoxLayout:
-            id: box_layout
-            orientation: 'vertical'
+            orientation: 'horizontal'
+            spacing: 10
             size_hint_y: None
-            height: self.minimum_height
-            padding: 30
-            spacing: 5
+            height: 50
 
-            BoxLayout:
-                orientation: 'horizontal'
-                spacing: 10
-                size_hint_y: None
-                height: 50
+            HoverButton:
+                text: 'Статистика по прошедшим элективам'
+                background_normal: ''
+                background_color: 40/255, 167/255, 69/255, 255/255
 
-                HoverButton:
-                    text: 'Статистика по прошедшим элективам'
-                    background_normal: ''
-                    background_color: 40/255, 167/255, 69/255, 255/255
-
-                HoverButton:
-                    text: 'Статистика по текущим элективам'
-                    background_normal: ''
-                    background_color: 40/255, 167/255, 69/255, 255/255
+            HoverButton:
+                text: 'Статистика по текущим элективам'
+                background_normal: ''
+                background_color: 40/255, 167/255, 69/255, 255/255
