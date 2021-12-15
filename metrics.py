@@ -9,6 +9,8 @@ def squared_priority_deviation(students):
             index = 5
         else:
             index, = np.where(student.priorities == student.elective_id)
+            if len(index)==0:
+                print(1)
         deviation += index ** 2
     return deviation / len(students)
 

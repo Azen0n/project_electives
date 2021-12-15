@@ -95,11 +95,15 @@ def transfer_graph(electives):
         for student in elective.result_students:
             for index, priority in enumerate(student.priorities):
                 if elective.id != priority:
-                    result_elective_index = np.where(student.priorities == student.elective_id)[0][0]
+                    if elective.id in student.priorities:
+                        result_elective_index = np.where(student.priorities == student.elective_id)[0][0]
+                    else:
+                        result_elective_index = 5
                     if optimal_transfer_graph[elective.id - 1][priority - 1] > (
                             result_elective_index - index) * student.performance:
                         optimal_transfer_graph[elective.id - 1][priority - 1] = np.round((
-                            index - result_elective_index) * student.performance, 10)
+                                                                                                 index - result_elective_index) * student.performance,
+                                                                                         10)
                         id_graph[elective.id - 1][priority - 1] = student.id
 
                 else:
@@ -132,32 +136,61 @@ def get_uncompleted_electives(electives, min_capacity):
     return np.array(uncompleted_electives)
 
 
-
-
 def remnant_students_allocation(optimal_transfer_graph, trans_graph, id_graph, electives, students, min_capacity):
     """Распределение оставшихся (нераспределенных) студентов."""
     remnant_students = get_remnant_students(students).tolist()
     remnant_students.sort(key=lambda x: 5 - x.performance)
-    remnant_students = np.array(remnant_students)
+    new_remnant_students = list()
+    for i, remnant in enumerate(remnant_students):
+        availability = False
+        for i1, priorities in enumerate(remnant.priorities):
+            tempp=min(optimal_transfer_graph[priorities - 1])
+            availability = min(optimal_transfer_graph[priorities - 1]) >= remnant.performance * (5 - i1)
+        if availability:
+            new_remnant_students.append(remnant)
+    while (len(remnant_students) != 0):
+        for elective in electives:
+            for i in range(elective.capacity - len(elective.result_students)):
+                elective.result_students.append(remnant_students[0])
+                remnant_students[0].elective_id = elective.id
+                remnant_students[0].is_available = False
+                remnant_students.pop(0)
+                if len(remnant_students) == 0:
+                    break
+            if len(remnant_students) == 0:
+                break
+    optimal_transfer_graph, id_graph = transfer_graph(electives)
+    floyd(optimal_transfer_graph, id_graph, electives, students)
+    for elective in electives:
+        templist = []
+        for student in elective.result_students:
+            if elective.id not in student.priorities:
+                student.elective_id = None
+                student.is_available = True
+            else:
+                templist.append(student)
+        elective.result_students = templist
+    print(1)
 
-    for student in remnant_students:
-        min_value = 25.0
-        temp5 = False
-        uncompleted_electives = get_uncompleted_electives(electives, min_capacity)
-        for i, priority in enumerate(student.priorities):
-            for elective in uncompleted_electives:
-                if optimal_transfer_graph[priority - 1][elective.id - 1] - student.performance * (5 - i) < min_value and \
-                        optimal_transfer_graph[priority - 1][elective.id - 1] != np.inf:
-                    min_value = min(optimal_transfer_graph[priority - 1]) + student.performance * (5 - i)
-                    min_index = elective.id - 1
-                    temp_priority = priority - 1
-                    temp5 = True
-        if temp5:
-            Hod(electives, trans_graph, id_graph, temp_priority, min_index, optimal_transfer_graph)
-            add_student_to_elective(student, electives[temp_priority])
-            optimal_transfer_graph, id_graph = transfer_graph(electives)
-            optimal_transfer_graph, trans_graph, id_graph = floyd(optimal_transfer_graph, id_graph, electives, students)
 
+# for student in remnant_students:
+#     min_value = 25.0
+#     temp5 = False
+#     uncompleted_electives = get_uncompleted_electives(electives, min_capacity)
+#     for i, priority in enumerate(student.priorities):
+#         for elective in uncompleted_electives:
+#             if optimal_transfer_graph[priority - 1][elective.id - 1] - student.performance * (5 - i) < min_value and \
+#                     optimal_transfer_graph[priority - 1][elective.id - 1] != np.inf:
+#                 min_value = min(optimal_transfer_graph[priority - 1]) + student.performance * (5 - i)
+#                 min_index = elective.id - 1
+#                 temp_priority = priority - 1
+#                 temp5 = True
+#     if temp5:
+#         Hod(electives, trans_graph, id_graph, temp_priority, min_index, optimal_transfer_graph)
+#         add_student_to_elective(student, electives[temp_priority])
+#         optimal_transfer_graph, id_graph = transfer_graph(electives)
+#         optimal_transfer_graph, trans_graph, id_graph = floyd(optimal_transfer_graph, id_graph, electives, students)
+#
 
 def floyd(optimal_transfer_graph, id_graph, electives, students):
     trans_graph = []
@@ -184,7 +217,8 @@ def floyd(optimal_transfer_graph, id_graph, electives, students):
             for i in range(optimal_transfer_graph.shape[0]):
                 for j in range(optimal_transfer_graph.shape[0]):
                     if optimal_transfer_graph[i][j] > optimal_transfer_graph[i][k] + optimal_transfer_graph[k][j]:
-                        optimal_transfer_graph[i][j] = np.round(optimal_transfer_graph[i][k] + optimal_transfer_graph[k][j],10)
+                        optimal_transfer_graph[i][j] = np.round(
+                            optimal_transfer_graph[i][k] + optimal_transfer_graph[k][j], 10)
                         trans_graph[i][j] = trans_graph[i][k] + trans_graph[k][j]
     return optimal_transfer_graph, trans_graph, id_graph
 
