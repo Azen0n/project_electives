@@ -31,101 +31,97 @@
 <ElectiveCard>
     orientation: 'vertical'
     size: root.width, root.height
+    padding: 25
+    spacing: 15
+
+    BoxLayout:
+        orientation: 'horizontal'
+        spacing: 20
+        size_hint_y: None
+        height: 60
+
+        ImageButton:
+            source: 'images/left_arrow.png'
+            size_hint: None, None
+            size: self.parent.height, self.parent.height
+            on_press: root.back_to_list()
+
+        ElectiveTextInput:
+            id: title
+            font_size: 25
+            height: self.parent.height
+
+        ImageButton:
+            source: 'images/save_button.png'
+            size_hint: None, None
+            size: self.parent.height, self.parent.height
+            on_press: root.save_elective(self)
 
     BoxLayout:
         orientation: 'vertical'
-        padding: 25
-        spacing: 15
+        spacing: 10
+        padding: 30, 0
 
-        BoxLayout:
-            orientation: 'horizontal'
-            spacing: 20
+        GridLayout:
+            cols: 5
+            spacing: 15, 5
             size_hint_y: None
-            height: 60
+            height: 65
 
-            ImageButton:
-                source: 'images/left_arrow.png'
-                size_hint: None, None
-                size: self.parent.height, self.parent.height
-                on_press: self.back_to_list()
+            ElectiveLabel:
+                text: 'Код'
+                size_hint_x: 3
+            ElectiveLabel:
+                text: 'Ак. часы'
+                size_hint_x: 1
+            ElectiveLabel:
+                text: 'Кол-во мест'
+                size_hint_x: 1.5
+            ElectiveLabel:
+                text: 'Ответственный'
+                size_hint_x: 4
+            ElectiveLabel:
+                text: 'Авторы'
+                size_hint_x: 4
 
             ElectiveTextInput:
-                id: title
-                font_size: 25
-                height: self.parent.height
-
-            ImageButton:
-                source: 'images/save_button.png'
-                size_hint: None, None
-                size: self.parent.height, self.parent.height
-                on_press: self.save_elective()
+                id:code
+            ElectiveTextInput:
+                max_length: 3
+                id: hours
+            ElectiveTextInput:
+                max_length: 3
+                id: max_students
+            ElectiveTextInput:
+                id: in_charge
+            ElectiveTextInput:
+                id: author
 
         BoxLayout:
             orientation: 'vertical'
-            spacing: 10
-            padding: 30, 0
-
-            GridLayout:
-                cols: 5
-                spacing: 15, 5
-                size_hint_y: None
-                height: 65
-
-                ElectiveLabel:
-                    text: 'Код'
-                    size_hint_x: 3
-                ElectiveLabel:
-                    text: 'Ак. часы'
-                    size_hint_x: 1
-                ElectiveLabel:
-                    text: 'Кол-во мест'
-                    size_hint_x: 1.5
-                ElectiveLabel:
-                    text: 'Ответственный'
-                    size_hint_x: 4
-                ElectiveLabel:
-                    text: 'Авторы'
-                    size_hint_x: 4
-
-                ElectiveTextInput:
-                    id:code
-                ElectiveTextInput:
-                    max_length: 3
-                    id: hours
-                ElectiveTextInput:
-                    max_length: 3
-                    id: max_students
-                ElectiveTextInput:
-                    id: in_charge
-                ElectiveTextInput:
-                    id: author
-
-            BoxLayout:
-                orientation: 'vertical'
-
-                ElectiveLabel:
-                    text: 'Аннотация'
-                    font_size: 20
-                    height: 40
-
-                TextInput:
-                    id: annotation
-                    text: 'Практическое проектирование программного обеспечения является одним из важнейших факторов практической подготовки студентов. В ходе выполнения проекта осваивается методика научного исследования, изучается передовой опыт, углубляются и систематизируются полученные теоретические знания. Велика роль проекта в формировании умений использования теоретических знаний в решении практических задач, самостоятельности в суждениях.'
-                    multiline: True
-                    cursor_color: 0, 0, 0, 1
-                    background_normal: ''
-                    canvas.before:
-                        Color:
-                            rgba: 0, 0, 0, 1
-                        Line:
-                            rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
-                            width: 1
 
             ElectiveLabel:
-                id: footer
-                text: 'Создан черновик: 22.05.2019 | Отправлено на согласование: 22.05.2019 | Опубликован: 22.05.2019 (Плотоненко Юрий Анатольевич)'
-                color: 0.4, 0.4, 0.4, 1
-                font_size: 12
-                text_size: self.size
-                valign: 'center'
-                halign: 'center'
+                text: 'Аннотация'
+                font_size: 20
+                height: 40
+
+            TextInput:
+                id: annotation
+                multiline: True
+                cursor_color: 0, 0, 0, 1
+                background_normal: ''
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+                        width: 1
+
+        ElectiveLabel:
+            id: footer
+            text: 'Создан черновик: 22.05.2019 | Отправлено на согласование: 22.05.2019 | Опубликован: 22.05.2019 (Плотоненко Юрий Анатольевич)'
+            color: 0.4, 0.4, 0.4, 1
+            font_size: 12
+            text_size: self.size
+            valign: 'center'
+            halign: 'center'

@@ -1,0 +1,89 @@
+<SemestersList>
+    size: root.width, root.height
+
+    BoxLayout:
+        id: box_layout
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        padding: 30
+        spacing: 10
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 20
+            size_hint_y: None
+            height: 60
+
+            ImageButton:
+                source: 'images/left_arrow.png'
+                size_hint: None, None
+                size: self.parent.height, self.parent.height
+                on_press: root.back_to_list()
+
+            Label:
+                id: title
+                text: 'Выберите семестр'
+                color: 0, 0, 0, 1
+                font_size: 25
+                height: self.parent.height
+
+
+<ElectivesList>
+    size: root.width, root.height
+
+    BoxLayout:
+        id: box_layout
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        padding: 30
+        spacing: 10
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 20
+            size_hint_y: None
+            height: 60
+
+            ImageButton:
+                source: 'images/left_arrow.png'
+                size_hint: None, None
+                size: self.parent.height, self.parent.height
+                on_press: root.back_to_list()
+
+            Label:
+                id: title
+                color: 0, 0, 0, 1
+                font_size: 25
+                height: self.parent.height
+
+
+<Statistics>
+    orientation: 'vertical'
+    size: root.width, root.height
+
+    Label:
+        id: title
+        color: 0, 0, 0, 1
+        font_size: 25
+
+
+    StatisticLabel:
+        id: first
+        text: ''
+    StatisticLabel:
+        id: second
+        text: ''
+    StatisticLabel:
+        id: third
+        text: ''
+    StatisticLabel:
+        id: fourth
+        text: ''
+    StatisticLabel:
+        id: fifth
+        text: ''
+
+<StatisticLabel@Label>
+    color: 0, 0, 0, 1
