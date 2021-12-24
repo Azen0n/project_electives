@@ -3,7 +3,7 @@ import copy
 import numpy as np
 
 
-def student_allocation(electives, students, min_capacity):
+def student_allocation(electives, students, min_capacity, quota):
     for elective in electives:
         fill_elective_with_students(students, elective)
         sort_students_in_elective(elective, reverse=False)
@@ -12,7 +12,7 @@ def student_allocation(electives, students, min_capacity):
     electives = np.array(sorted(electives, key=lambda x: x.reserve, reverse=True))
 
     for elective in electives:
-        if min_capacity / 2.0 <= elective.reserve < min_capacity:
+        if min_capacity / 2.0 - quota <= elective.reserve < min_capacity:
             for student in elective.students:
                 # student[0] — студент (есть поля id и прочее)
                 # student[1] — приоритет электива
@@ -33,17 +33,19 @@ def student_allocation(electives, students, min_capacity):
     for i in range(1, 6):
         for elective in electives:
             for student in elective.students:
-                if student[1] == i and student[0].is_available and len(
-                        elective.result_students) < elective.capacity and (
-                        min_capacity < len(elective.students) / 2.0 or elective.reserve >= min_capacity) and len(
-                    elective.result_students) < min_capacity:
+                if student[1] == i and student[0].is_available \
+                        and len(elective.result_students) < elective.capacity \
+                        and (min_capacity < (len(elective.students)) / 2.0
+                             or elective.reserve >= min_capacity) \
+                        and len(elective.result_students) < min_capacity:
                     add_student_to_elective(student[0], elective)
 
     for i in range(1, 6):
         for elective in electives:
             for student in elective.students:
                 if student[1] == i and student[0].is_available and len(
-                        elective.result_students) < elective.capacity and min_capacity < len(elective.students) / 2.0:
+                        elective.result_students) < elective.capacity and min_capacity < (
+                        len(elective.students)) / 2.0:
                     add_student_to_elective(student[0], elective)
 
     electives = np.array(sorted(electives, key=lambda x: x.id))
@@ -115,7 +117,7 @@ def transfer_graph(electives):
             if optimal_transfer_graph[i][j] + optimal_transfer_graph[j][i] < 0:
                 prikol += 1
 
-    return (optimal_transfer_graph, id_graph)
+    return optimal_transfer_graph, id_graph
 
 
 def get_remnant_students(students):
@@ -144,11 +146,10 @@ def remnant_students_allocation(optimal_transfer_graph, trans_graph, id_graph, e
     for i, remnant in enumerate(remnant_students):
         availability = False
         for i1, priorities in enumerate(remnant.priorities):
-            tempp=min(optimal_transfer_graph[priorities - 1])
             availability = min(optimal_transfer_graph[priorities - 1]) >= remnant.performance * (5 - i1)
         if availability:
             new_remnant_students.append(remnant)
-    while (len(remnant_students) != 0):
+    while len(remnant_students) != 0:
         for elective in electives:
             for i in range(elective.capacity - len(elective.result_students)):
                 elective.result_students.append(remnant_students[0])
@@ -202,17 +203,16 @@ def floyd(optimal_transfer_graph, id_graph, electives, students):
             optimal_transfer_graph[i][j] = (optimal_transfer_graph[i][j])
             trans_graph[i].append([(i, j)])
     trans_graph2 = copy.deepcopy(trans_graph)
-    while (temp9):
+    while temp9:
         temp9 = False
         for k in range(optimal_transfer_graph.shape[0]):
             pop += 1
             for p in range(optimal_transfer_graph.shape[0]):
-                if (len(trans_graph[p][p]) != 1 and optimal_transfer_graph[p][p] != np.inf):
+                if len(trans_graph[p][p]) != 1 and optimal_transfer_graph[p][p] != np.inf:
                     k = 0
                     Hod(electives, trans_graph, id_graph, p, p, optimal_transfer_graph)
                     optimal_transfer_graph, id_graph = transfer_graph(electives)
                     trans_graph = copy.deepcopy(trans_graph2)
-                    trans_graph
                     temp9 = True
             for i in range(optimal_transfer_graph.shape[0]):
                 for j in range(optimal_transfer_graph.shape[0]):
@@ -240,3 +240,30 @@ def Hod(electives, trans_graph, id_graph, k, p, optimal_transfer_graph):
         else:
             temp2.elective_id = transposition[1] + 1
             electives[transposition[1]].result_students.append(temp2)
+
+
+def reset_variables(students, electives, trans_graph, id_graph, optimal_transfer_graph):
+    for student in students:
+        if student.elective_id is not None:
+            temp10 = electives[student.elective_id - 1].day
+            new_priorities = []
+            for priority in student.priorities:
+                if electives[priority - 1].day != temp10:
+                    new_priorities.append(priority)
+            student.priorities = np.array(new_priorities)
+            student.elective_id = None
+            student.is_available = True
+
+    for elective in electives:
+        elective.students = []
+        elective.result_students = []
+        elective.reserve = 0
+
+    trans_graph = None
+    id_graph = None
+    optimal_transfer_graph = None
+
+
+def replace_conflict_priorities(students):
+    """Убираем из выборов студента те элективы, которые проходят в тот же день недели."""
+    pass

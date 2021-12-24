@@ -54,6 +54,17 @@ def students_rate(students):
     return rates
 
 
+def get_number_of_priorities_remaining(students):
+    rates = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 0: 0.0}
+    for student in students:
+        rates[len(student.priorities)] += 1
+
+    for key in rates:
+        rates[key] = rates[key] / len(students) * 100.0
+
+    return rates
+
+
 def call_all_metrics(students):
     print(f'squared_priority_deviation = {squared_priority_deviation(students)}')
     print(f'mean_priority = {mean_priority(students)}')

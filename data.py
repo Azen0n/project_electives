@@ -2,18 +2,16 @@ import numpy as np
 
 
 class Elective:
-    def __init__(self, id, capacity, students):
+    def __init__(self, id, capacity, students, day):
         self.id = id
         self.capacity = capacity    # Максимальная вместимость
         self.students = students    # Список всех студентов, выбравших этот электив
         self.result_students = []   # Финальный список студентов электива
         self.reserve = 0            # Количество первых приоритетов в запасе
+        self.day = day              # День недели
 
     def __repr__(self):
-        return f'[id: {self.id},\tcapacity: {self.capacity},\tstudents: {self.students}]'
-
-    def add_student(self, student, priority):
-        self.students.append((student, priority))
+        return f'id: {self.id}, capacity: {self.capacity}, students: {self.students}, day: {self.day}'
 
 
 class Student:
@@ -25,7 +23,7 @@ class Student:
         self.is_available = True
 
     def __repr__(self):
-        return f'[id: {self.id},\tperformance: {self.performance},\tpriorities: {self.priorities}]'
+        return f'id: {self.id}, performance: {self.performance}, priorities: {self.priorities}'
 
 
 def generate_students_priorities(number_of_students, number_of_electives, distribution):
@@ -47,7 +45,7 @@ def generate_students_priorities(number_of_students, number_of_electives, distri
 
 def generate_electives(number_of_electives, min_capacity, max_capacity):
     """Генерация массива элективов"""
-    return np.array([Elective(i + 1, np.random.randint(min_capacity, max_capacity), [])
+    return np.array([Elective(i + 1, np.random.randint(min_capacity, max_capacity), [], np.random.randint(1, 5))
                      for i in range(number_of_electives)])
 
 
