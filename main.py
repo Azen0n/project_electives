@@ -45,6 +45,7 @@ if __name__ == '__main__':
 
     confirm_students_allocation(students)
 
+    ###############################################
     reset_variables(students, electives, bratki_tapki, temp_graph, optimal_transfer_graph)
     print(get_number_of_priorities_remaining(students))
 

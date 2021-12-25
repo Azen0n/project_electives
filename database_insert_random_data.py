@@ -12,8 +12,8 @@ if __name__ == '__main__':
     sql = 'truncate Directions;'
     cur.execute(sql)
 
-    number_of_students = 400
-    number_of_electives = 20
+    number_of_students = 800
+    number_of_electives = 40
 
     students = generate_students(number_of_students, number_of_electives, distribution='gamma')
     electives = generate_electives(number_of_electives, 20, 25)

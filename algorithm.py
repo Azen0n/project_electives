@@ -9,6 +9,11 @@ def student_allocation(electives, students, min_capacity, quota):
         sort_students_in_elective(elective, reverse=False)
         calculate_reserve(elective)
 
+    for elective in electives:
+        mean = sum(np.array(elective.students)[:, 1]) / len(elective.students)
+        print(mean)
+
+
     electives = np.array(sorted(electives, key=lambda x: x.reserve, reverse=True))
 
     for elective in electives:
@@ -171,7 +176,6 @@ def remnant_students_allocation(optimal_transfer_graph, trans_graph, id_graph, e
             else:
                 templist.append(student)
         elective.result_students = templist
-    print(1)
 
 
 # for student in remnant_students:

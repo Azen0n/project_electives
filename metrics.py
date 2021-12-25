@@ -66,7 +66,7 @@ def get_number_of_priorities_remaining(students):
 
 
 def call_all_metrics(students):
-    print(f'squared_priority_deviation = {squared_priority_deviation(students)}')
+    # print(f'squared_priority_deviation = {squared_priority_deviation(students)}')
     print(f'mean_priority = {mean_priority(students)}')
-    print(f'sum_of_priority_performance_product = {sum_of_priority_performance_product(students)}')
+    # print(f'sum_of_priority_performance_product = {sum_of_priority_performance_product(students)}')
     print(f'students_rate = {students_rate(students)}')
