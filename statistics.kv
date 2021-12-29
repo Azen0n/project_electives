@@ -1,89 +1,131 @@
 <SemestersList>
-    size: root.width, root.height
+    orientation: 'vertical'
+    recycleView: recycleView
 
     BoxLayout:
-        id: box_layout
-        orientation: 'vertical'
-        size_hint_y: None
-        height: self.minimum_height
+        orientation: 'horizontal'
         padding: 30
-        spacing: 10
+        spacing: 20
+        size_hint_y: None
+        height: 120
 
-        BoxLayout:
-            orientation: 'horizontal'
-            spacing: 20
+        ImageButton:
+            source: 'images/left_arrow.png'
+            size_hint: None, None
+            size: 60, 60
+            on_press: root.back_to_list()
+
+        Label:
+            id: title
+            text: 'Выберите семестр'
+            color: 0, 0, 0, 1
+            font_size: 25
+            height: self.parent.height
+
+    RecycleView:
+        id: recycleView
+        viewclass: 'ListLine'
+        scroll_type: ['bars']
+        scroll_wheel_distance: 100
+        bar_width: 10
+
+        RecycleBoxLayout:
+            orientation: 'vertical'
+            padding: 30
+            spacing: 10
+            default_size: None, 50
+            default_size_hint: 1, None
             size_hint_y: None
-            height: 60
-
-            ImageButton:
-                source: 'images/left_arrow.png'
-                size_hint: None, None
-                size: self.parent.height, self.parent.height
-                on_press: root.back_to_list()
-
-            Label:
-                id: title
-                text: 'Выберите семестр'
-                color: 0, 0, 0, 1
-                font_size: 25
-                height: self.parent.height
+            height: self.minimum_height
 
 
 <ElectivesList>
-    size: root.width, root.height
+    orientation: 'vertical'
+    recycleView: recycleView
 
     BoxLayout:
-        id: box_layout
-        orientation: 'vertical'
-        size_hint_y: None
-        height: self.minimum_height
+        orientation: 'horizontal'
         padding: 30
-        spacing: 10
+        spacing: 20
+        size_hint_y: None
+        height: 120
 
-        BoxLayout:
-            orientation: 'horizontal'
-            spacing: 20
+        ImageButton:
+            source: 'images/left_arrow.png'
+            size_hint: None, None
+            size: 60, 60
+            on_press: root.back_to_list()
+
+        Label:
+            id: title
+            text: 'Выберите электив'
+            color: 0, 0, 0, 1
+            font_size: 25
+            height: self.parent.height
+
+    RecycleView:
+        id: recycleView
+        viewclass: 'ListLine'
+        scroll_type: ['bars']
+        scroll_wheel_distance: 100
+        bar_width: 10
+
+        RecycleBoxLayout:
+            orientation: 'vertical'
+            padding: 30
+            spacing: 10
+            default_size: None, 50
+            default_size_hint: 1, None
             size_hint_y: None
-            height: 60
-
-            ImageButton:
-                source: 'images/left_arrow.png'
-                size_hint: None, None
-                size: self.parent.height, self.parent.height
-                on_press: root.back_to_list()
-
-            Label:
-                id: title
-                color: 0, 0, 0, 1
-                font_size: 25
-                height: self.parent.height
+            height: self.minimum_height
 
 
 <Statistics>
     orientation: 'vertical'
+    adaptive_height: True
     size: root.width, root.height
 
     Label:
         id: title
         color: 0, 0, 0, 1
         font_size: 25
+        size_hint_y: None
+        height: 50
 
+    GridLayout:
+        cols: 2
+        adaptive_height: True
+        StatisticLabel:
+            text: 'Выбрано первым приоритетом:'
+        StatisticLabel:
+            id: first
+            text: '10'
+        StatisticLabel:
+            text: 'Выбрано вторым приоритетом:'
+        StatisticLabel:
+            id: second
+            text: '20'
+        StatisticLabel:
+            text: 'Выбрано третим приоритетом:'
+        StatisticLabel:
+            id: third
+            text: '30'
+        StatisticLabel:
+            text: 'Выбрано четвертым приоритетом:'
+        StatisticLabel:
+            id: fourth
+            text: '40'
+        StatisticLabel:
+            text: 'Выбраном пятым приоритетом:'
+        StatisticLabel:
+            id: fifth
+            text: '50'
+        StatisticLabel:
+            text: 'Средняя оценка студентов:'
+        StatisticLabel:
+            id: average_mark
+            text: '4.56'
 
-    StatisticLabel:
-        id: first
-        text: ''
-    StatisticLabel:
-        id: second
-        text: ''
-    StatisticLabel:
-        id: third
-        text: ''
-    StatisticLabel:
-        id: fourth
-        text: ''
-    StatisticLabel:
-        id: fifth
-        text: ''
 
 <StatisticLabel@Label>
     color: 0, 0, 0, 1
