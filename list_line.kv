@@ -1,0 +1,26 @@
+<ListLine@RecycleKVIDsDataViewBehavior+BoxLayout>:
+    padding: 30
+    spacing: 30
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    Label:
+        id: line_label
+        color: 0, 0, 0, 1
+        size_hint_y: None
+        height: 60
+        text_size: self.size
+        valign: 'center'
+        pos_hint: { 'left': 0, 'center_y': 0.5 }
+
+    HoverButton:
+        id: line_button
+        size_hint: None, None
+        size: 200, 30
+        pos_hint: { 'right': 1, 'center_y': 0.5 }
+        background_normal: ''
+        background_color: 40/255, 167/255, 69/255, 255/255
