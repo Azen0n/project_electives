@@ -1,24 +1,26 @@
+import components
+import database_access
 from kivy.app import App
-from kivy.uix.image import Image
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.behaviors import ButtonBehavior
 
+# region Builder Loading Files
 from kivy.lang import Builder
 
 Builder.load_file('administrator_menu.kv')
 Builder.load_file('elective_card.kv')
 Builder.load_file('statistics.kv')
-Builder.load_file('lines_list.kv')
+Builder.load_file('list_line.kv')
+# endregion
 
+# region Window Settings
 from kivy.core.window import Window
 
 Window.size = 1280, 720
 Window.minimum_width, Window.minimum_height = 800, 600
 Window.clearcolor = 0.98, 0.98, 0.98, 1
+# endregion
 
+# region ScreenManager Initialize
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 screen_manager = ScreenManager()
@@ -34,17 +36,20 @@ screen_manager.add_widget(electives_list_screen)
 screen_manager.add_widget(statistics_screen)
 
 
-class AdministrativeMenu(ScrollView):
+# endregion
+
+
+class AdministrativeMenu(BoxLayout):
     def __init__(self):
         super(AdministrativeMenu, self).__init__()
 
-        # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре
-        list_of_elective_names = [str(i) for i in range(1, 20)]
-        list_of_elective_codes = [str(i) for i in range(19)]
-        elective_dictionary = dict(zip(list_of_elective_codes, list_of_elective_names))
-        self.ids.box_layout.add_widget(LinesList(elective_dictionary,
-                                                 'Редактировать',
-                                                 AdministrativeMenu.edit_button_click))
+        elective_code_list, elective_name_list = database_access.get_current_elective_codes_and_names()
+        self.recycleView.data = [
+            {'code': elective_code_list[i],
+             'line_label.text': elective_name_list[i],
+             'line_button.text': 'Редактировать',
+             'line_button.on_press': AdministrativeMenu.edit_button_click}
+            for i in range(len(elective_code_list))]
 
     @staticmethod
     def statistics_button_click():
@@ -52,105 +57,38 @@ class AdministrativeMenu(ScrollView):
         screen_manager.transition.direction = 'left'
         Window.set_system_cursor('arrow')
 
+    # FIXME: Добавить аргумент button
     @staticmethod
-    def edit_button_click(button):
+    def edit_button_click():
         screen_manager.current = 'elective'
         screen_manager.transition.direction = 'left'
         Window.set_system_cursor('arrow')
-        AdministrativeMenu.fill_elective_fields(button)
+        # AdministrativeMenu.fill_elective_fields(button)
 
     @staticmethod
     def fill_elective_fields(button):
         elective_code = button.parent.elective_code
-
-        # TODO: Сделать запрос к БД, взять информацию об элективе по его коду
+        # FIXME: Убрать обращение через children
         elective_ids = elective_screen.children[0].ids
-        elective_ids.title.text = ''
-        elective_ids.code.text += ''
-        elective_ids.hours.text += ''
-        elective_ids.max_students.text += ''
-        elective_ids.in_charge.text += ''
-        elective_ids.author.text += ''
-        elective_ids.annotation.text += ''
-        elective_ids.footer.text += ''
 
-
-class LinesList(BoxLayout):
-    def __init__(self, objects, button_text, button_click):
-        super(LinesList, self).__init__()
-
-        if type(objects) == dict:
-            for item in objects.items():
-                self.add_widget(ListLine(item, button_text, button_click))
-        else:
-            for i in objects:
-                self.add_widget(ListLine(i, button_text, button_click))
-
-
-class ListLine(BoxLayout):
-    def __init__(self, item, button_text, button_click):
-        super(ListLine, self).__init__()
-        if type(item) == tuple:
-            self.elective_code = item[0]
-            self.ids.line_label.text = item[1]
-        else:
-            self.ids.line_label.text = item
-        self.ids.line_button.text = button_text
-        self.ids.line_button.bind(on_press=button_click)
-
-
-class HoverBehavior(object):
-    hovered = False
-    border_point = None
-
-    def __init__(self):
-        self.register_event_type('on_enter')
-        self.register_event_type('on_leave')
-        Window.bind(mouse_pos=self.on_mouse_pos)
-        super(HoverBehavior, self).__init__()
-
-    def on_mouse_pos(self, *args):
-        if not self.get_root_window():
-            return
-        pos = args[1]
-        inside = self.collide_point(*self.to_widget(*pos))
-        if self.hovered == inside:
-            return
-        self.border_point = pos
-        self.hovered = inside
-        if inside:
-            self.dispatch('on_enter')
-        else:
-            self.dispatch('on_leave')
-
-
-class HoverButton(Button, HoverBehavior):
-    @staticmethod
-    def on_enter():
-        Window.set_system_cursor('hand')
-
-    @staticmethod
-    def on_leave():
-        Window.set_system_cursor('arrow')
-
-
-class ElectiveTextInput(TextInput):
-    max_length = 50
-
-    def insert_text(self, substring, from_undo=False):
-        if len(self.text) < self.max_length:
-            return super().insert_text(substring, from_undo=from_undo)
-
-
-class ImageButton(ButtonBehavior, Image):
-    pass
+        elective_info = database_access.get_info_by_elective_code(elective_code)
 
 
 class ElectiveCard(BoxLayout):
     @staticmethod
     def save_elective(button):
+        # FIXME: Убрать обращение через parent
         elective_ids = button.parent.parent.ids
-        # TODO: Сделать запрос к БД, отдать измененые данные
+        elective_info = dict()
+        elective_info['code'] = elective_ids.code
+        elective_info['name'] = elective_ids.name
+        elective_info['hours'] = elective_ids.hours
+        elective_info['max_students'] = elective_ids.max_students
+        elective_info['in_charge'] = elective_ids.in_charge
+        elective_info['author'] = elective_ids.author
+        elective_info['footer'] = elective_ids.footer
+
+        database_access.set_info_by_elective_code(elective_info)
 
     @staticmethod
     def back_to_list():
@@ -158,38 +96,41 @@ class ElectiveCard(BoxLayout):
         screen_manager.transition.direction = 'right'
 
 
-class SemestersList(ScrollView):
+class SemestersList(BoxLayout):
     def __init__(self):
         super(SemestersList, self).__init__()
 
-        # TODO: Сделать запрос к БД, взять список семестров
-        list_of_semesters = [str(i) for i in range(1, 20)]
-        self.ids.box_layout.add_widget(LinesList(list_of_semesters,
-                                                 'Открыть',
-                                                 SemestersList.open_button_click))
+        semester_name_list = database_access.get_semesters()
+        self.recycleView.data = [
+            {'code': semester_name_list[i],
+             'line_label.text': semester_name_list[i],
+             'line_button.text': 'Открыть',
+             'line_button.on_press': SemestersList.open_button_click}
+            for i in range(len(semester_name_list))]
 
+    # FIXME: Добавить аргумент button
     @staticmethod
-    def open_button_click(button):
+    def open_button_click():
         screen_manager.current = 'electives_list'
         screen_manager.transition.direction = 'left'
         Window.set_system_cursor('arrow')
-        SemestersList.fill_electives_list(button)
+        # SemestersList.fill_electives_list(button)
 
     @staticmethod
     def fill_electives_list(button):
+        # FIXME: Убрать обращение через parent
         semester_name = button.parent.children[1].text
+        # FIXME: Убрать обращение через screens
         electives_list_ids = screen_manager.screens[3].children[0].ids
         electives_list_ids.title.text = semester_name
 
-        # TODO: Сделать запрос к БД, взять список элективов (и их коды) в выбранном семестре
-        list_of_elective_names = [str(i) for i in range(1, 20)]
-        list_of_elective_codes = [str(i) for i in range(19)]
-        elective_dictionary = dict(zip(list_of_elective_codes, list_of_elective_names))
-        if len(electives_list_ids.box_layout.children) > 1:
-            electives_list_ids.box_layout.remove_widget(electives_list_ids.box_layout.children[0])
-        electives_list_ids.box_layout.add_widget(LinesList(elective_dictionary,
-                                                           'Открыть',
-                                                           ElectivesList.open_button_click))
+        elective_code_list, elective_name_list = database_access.get_elective_codes_and_names_by_semester(semester_name)
+        electives_list_ids.recycleView.data = [
+            {'code': elective_code_list[i],
+             'line_label.text': elective_name_list[i],
+             'line_button.text': 'Открыть',
+             'line_button.on_press': SemestersList.open_button_click}
+            for i in range(len(elective_code_list))]
 
     @staticmethod
     def back_to_list():
@@ -197,26 +138,23 @@ class SemestersList(ScrollView):
         screen_manager.transition.direction = 'right'
 
 
-class ElectivesList(ScrollView):
+# FIXME: Объединить с SemestersList
+class ElectivesList(BoxLayout):
+    # FIXME: Добавить аргумент button
     @staticmethod
-    def open_button_click(button):
+    def open_button_click():
         screen_manager.current = 'statistics'
         screen_manager.transition.direction = 'left'
         Window.set_system_cursor('arrow')
-        ElectivesList.fill_statistics(button)
+        # ElectivesList.fill_statistics(button)
 
     @staticmethod
     def fill_statistics(button):
         elective_code = button.parent.elective_code
-
-        # TODO: Сделать запрос к БД, взять статистику об выбранном элективе по его коду
+        # FIXME: Убрать обращение через screens
         elective_ids = screen_manager.screens[4].children[0].ids
-        elective_ids.title.text = ''
-        elective_ids.first.text = ''
-        elective_ids.second.text = ''
-        elective_ids.third.text = ''
-        elective_ids.fourth.text = ''
-        elective_ids.fifth.text = ''
+
+        elective_statistics = database_access.get_statistics_by_elective_code(elective_code)
 
     @staticmethod
     def back_to_list():
