@@ -12,15 +12,17 @@ def get_info_by_elective_code(code):
     # TODO: Сделать запрос к БД, взять информацию об элективе по его коду
     info_tuple = (0, 1, 2, 3, 4, 5, 6, 7)  # Генерация данных
 
+    string_info_tuple = list(map(str, info_tuple))
+
     info = {
-        'code': info_tuple[0],
-        'name': info_tuple[1],
-        'capacity': info_tuple[2],
-        'hours': info_tuple[3],
-        'in_charge': info_tuple[4],
-        'author': info_tuple[5],
-        'annotation': info_tuple[6],
-        'footer_date': info_tuple[7]
+        'code': string_info_tuple[0],
+        'name': string_info_tuple[1],
+        'capacity': string_info_tuple[2],
+        'hours': string_info_tuple[3],
+        'in_charge': string_info_tuple[4],
+        'author': string_info_tuple[5],
+        'annotation': string_info_tuple[6],
+        'footer_date': string_info_tuple[7]
     }
     return info
 
