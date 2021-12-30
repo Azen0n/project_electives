@@ -43,30 +43,41 @@ class AdminMenu(BoxLayout):
     def line_button_callback(button):
         screen_manager.switch_to(elective_screen, direction='left')
         Window.set_system_cursor('arrow')
-        AdminMenu.fill_elective_fields(button)
 
-    @staticmethod
-    def fill_elective_fields(button):
+        # FIXME: Убрать обращение через parent
         elective_code = button.parent.code
-        # FIXME: Убрать обращение через children
-        elective_ids = elective_screen.children[0].ids
-
         elective_info = database_access.get_info_by_elective_code(elective_code)
+        # FIXME: Убрать обращение через children
+        ElectiveCard.fill_card_with_info(elective_screen.children[0], elective_info)
 
 
 class ElectiveCard(BoxLayout):
     @staticmethod
+    def fill_card_with_info(card, info):
+        card.ids.name.text = info['name']
+        card.ids.code.text = info['code']
+        card.ids.hours.text = info['hours']
+        card.ids.max_students.text = info['capacity']
+        card.ids.in_charge.text = info['in_charge']
+        card.ids.author.text = info['author']
+        card.ids.annotation.text = info['annotation']
+        card.ids.footer.text = 'Создан черновик: {0} | Отправлено на согласование: {0} | Опубликован: {0} ({1})' \
+            .format(info['footer_date'], info['author'])
+
+    @staticmethod
     def save_elective(button):
         # FIXME: Убрать обращение через parent
         elective_ids = button.parent.parent.ids
-        elective_info = dict()
-        elective_info['code'] = elective_ids.code
-        elective_info['name'] = elective_ids.name
-        elective_info['hours'] = elective_ids.hours
-        elective_info['max_students'] = elective_ids.max_students
-        elective_info['in_charge'] = elective_ids.in_charge
-        elective_info['author'] = elective_ids.author
-        elective_info['footer'] = elective_ids.footer
+        elective_info = {
+            'code': elective_ids.code,
+            'name': elective_ids.name,
+            'hours': elective_ids.hours,
+            'capacity': elective_ids.max_students,
+            'in_charge': elective_ids.in_charge,
+            'author': elective_ids.author,
+            'annotation': elective_ids.annotation,
+            'footer_data': elective_ids.footer
+        }
 
         database_access.set_info_by_elective_code(elective_info)
 
