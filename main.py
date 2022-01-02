@@ -1,34 +1,35 @@
 import components
 import database_access
+from extended_screen_manager import ExtendedScreenManager
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import RiseInTransition, SlideTransition
 
-# region Builder Loading Files
 Builder.load_file('administrator_menu.kv')
 Builder.load_file('elective_card.kv')
 Builder.load_file('statistics.kv')
 Builder.load_file('list_line.kv')
-# endregion
 
-# region Window Settings
 Window.size = 1280, 720
-Window.minimum_width, Window.minimum_height = 800, 600
+Window.minimum_width = 800
+Window.minimum_height = 600
 Window.clearcolor = 0.98, 0.98, 0.98, 1
 
-
-# endregion
+screen_manager: ExtendedScreenManager
 
 
 class AdminMenu(BoxLayout):
-    def __init__(self):
-        super(AdminMenu, self).__init__()
+    def __init__(self, **kwargs):
+        super(AdminMenu, self).__init__(**kwargs)
+        Clock.schedule_once(self._init_recycle_view)
 
+    def _init_recycle_view(self, dt):
         elective_code_list, elective_name_list = database_access.get_current_elective_codes_and_names()
         self.recycleView.data = [
-            {'code': elective_code_list[i],
+            {'line_button.code': elective_code_list[i],
              'line_label.text': elective_name_list[i],
              'line_button.text': 'Редактировать',
              'line_button.root': self}
@@ -36,19 +37,19 @@ class AdminMenu(BoxLayout):
 
     @staticmethod
     def statistics_button_click():
-        screen_manager.switch_to(semester_list_screen, direction='left')
+        screen_manager.display_screen('semester_list', transition=SlideTransition(), direction='left')
         Window.set_system_cursor('arrow')
 
     @staticmethod
     def line_button_callback(button):
-        screen_manager.switch_to(elective_screen, direction='left')
+        elective_card_screen = screen_manager.get_screen('elective_card')
+        screen_manager.display_screen(elective_card_screen, transition=SlideTransition(), direction='left')
         Window.set_system_cursor('arrow')
 
-        # FIXME: Убрать обращение через parent
-        elective_code = button.parent.code
+        elective_code = button.code
         elective_info = database_access.get_info_by_elective_code(elective_code)
         # FIXME: Убрать обращение через children
-        ElectiveCard.fill_card_with_info(elective_screen.children[0], elective_info)
+        ElectiveCard.fill_card_with_info(elective_card_screen.children[0], elective_info)
 
 
 class ElectiveCard(BoxLayout):
@@ -65,123 +66,105 @@ class ElectiveCard(BoxLayout):
             .format(info['footer_date'], info['author'])
 
     @staticmethod
-    def save_elective(button):
-        # FIXME: Убрать обращение через parent
-        elective_ids = button.parent.parent.ids
+    def save_elective_info():
+        kek = screen_manager.get_screen('elective_card')
+        elective_card = kek.ids.elective_card
         elective_info = {
-            'code': elective_ids.code,
-            'name': elective_ids.name,
-            'hours': elective_ids.hours,
-            'capacity': elective_ids.max_students,
-            'in_charge': elective_ids.in_charge,
-            'author': elective_ids.author,
-            'annotation': elective_ids.annotation,
-            'footer_data': elective_ids.footer
+            'code': elective_card.ids.code,
+            'name': elective_card.ids.name,
+            'hours': elective_card.ids.hours,
+            'capacity': elective_card.ids.max_students,
+            'in_charge': elective_card.ids.in_charge,
+            'author': elective_card.ids.author,
+            'annotation': elective_card.ids.annotation,
+            'footer_data': elective_card.ids.footer
         }
 
         database_access.set_info_by_elective_code(elective_info)
 
     @staticmethod
     def back_to_list():
-        screen_manager.switch_to(admin_menu_srceen, direction='right')
+        screen_manager.display_screen('admin_menu', transition=SlideTransition(), direction='right')
+        Window.set_system_cursor('arrow')
 
 
-class SemestersList(BoxLayout):
-    def __init__(self):
-        super(SemestersList, self).__init__()
+class SemesterList(BoxLayout):
+    def __init__(self, **kwargs):
+        super(SemesterList, self).__init__(**kwargs)
+        Clock.schedule_once(self._init_recycle_view)
 
+    def _init_recycle_view(self, dt):
         semester_name_list = database_access.get_semesters()
-        self.recycleView.data = [
-            {'code': semester_name_list[i],
-             'line_label.text': semester_name_list[i],
-             'line_button.text': 'Открыть',
-             'line_button.root': self}
-            for i in range(len(semester_name_list))]
+        self.recycleView.data = [{
+            'line_button.code': semester_name_list[i],
+            'line_label.text': semester_name_list[i],
+            'line_button.text': 'Открыть',
+            'line_button.root': self
+        } for i in range(len(semester_name_list))]
 
     @staticmethod
     def line_button_callback(button):
-        screen_manager.switch_to(elective_list_screen, direction='left')
+        elective_list_screen = screen_manager.get_screen('elective_list')
+        screen_manager.display_screen(elective_list_screen, transition=SlideTransition(), direction='left')
         Window.set_system_cursor('arrow')
-        SemestersList.fill_elective_list(button)
 
-    @staticmethod
-    def fill_elective_list(button):
-        # FIXME: Убрать обращение через parent
-        semester_name = button.parent.children[1].text
+        semester = button.code
         # FIXME: Убрать обращение через children
-        elective_list = elective_list_screen.children[0]
-        elective_list.ids.title.text = semester_name
-
-        ElectivesList.fill_elective_list_by_semester(elective_list, semester_name)
+        ElectiveList.fill_elective_list_by_semester(elective_list_screen.children[0], semester)
 
     @staticmethod
     def back_to_list():
-        screen_manager.switch_to(admin_menu_srceen, direction='right')
+        screen_manager.display_screen('admin_menu', transition=SlideTransition(), direction='right')
+        Window.set_system_cursor('arrow')
 
 
 # FIXME: Объединить с SemestersList
-class ElectivesList(BoxLayout):
+class ElectiveList(BoxLayout):
     @staticmethod
-    def fill_elective_list_by_semester(elective_list, semester_name):
-        elective_code_list, elective_name_list = database_access.get_elective_codes_and_names_by_semester(semester_name)
+    def fill_elective_list_by_semester(elective_list, semester):
+        elective_list.ids.title.text = semester
+        elective_code_list, elective_name_list = database_access.get_elective_codes_and_names_by_semester(semester)
         elective_list.ids.recycleView.data = [
-            {'code': elective_code_list[i],
+            {'line_button.code': elective_code_list[i],
              'line_label.text': elective_name_list[i],
              'line_button.text': 'Открыть',
              'line_button.root': elective_list}
             for i in range(len(elective_code_list))]
 
     @staticmethod
+    # Перемещает фокус на экран статистики и заполняет его
     def line_button_callback(button):
-        screen_manager.switch_to(statistics_screen, direction='left')
+        statistics_screen = screen_manager.get_screen('statistics')
+        screen_manager.display_screen(statistics_screen, transition=SlideTransition(), direction='left')
         Window.set_system_cursor('arrow')
-        ElectivesList.fill_statistics(button)
 
-    @staticmethod
-    def fill_statistics(button):
-        elective_code = button.parent.code
+        elective_code = button.code
         # FIXME: Убрать обращение через children
         elective_ids = statistics_screen.children[0].ids
-
         elective_statistics = database_access.get_statistics_by_elective_code(elective_code)
 
     @staticmethod
     def back_to_list():
-        screen_manager.switch_to(semester_list_screen, direction='right')
+        screen_manager.display_screen('semester_list', transition=SlideTransition(), direction='right')
+        Window.set_system_cursor('arrow')
 
 
 class Statistics(BoxLayout):
     pass
 
 
-# region ScreenManager Initialize
-
-screen_manager = ScreenManager()
-admin_menu_srceen = Screen(name='admin_menu')
-elective_screen = Screen(name='elective')
-semester_list_screen = Screen(name='semesters_list')
-elective_list_screen = Screen(name='electives_list')
-statistics_screen = Screen(name='statistics')
-admin_menu_srceen.add_widget(AdminMenu())
-elective_screen.add_widget(ElectiveCard())
-semester_list_screen.add_widget(SemestersList())
-elective_list_screen.add_widget(ElectivesList())
-statistics_screen.add_widget(Statistics())
-screen_manager.add_widget(admin_menu_srceen)
-screen_manager.add_widget(elective_screen)
-screen_manager.add_widget(semester_list_screen)
-screen_manager.add_widget(elective_list_screen)
-screen_manager.add_widget(statistics_screen)
+class Menu(BoxLayout):
+    @staticmethod
+    def admin_menu_button_click():
+        screen_manager.display_screen('admin_menu', transition=RiseInTransition(clearcolor=Window.clearcolor))
 
 
-# endregion
-
-class KivyApp(App):
+class BrainDeadApp(App):
     def build(self):
         self.title = '内部で死んでいる'
         self.icon = 'images/braindead_logo.png'
+        global screen_manager
+        screen_manager = self.root.ids.screen_manager
 
-        return screen_manager
 
-
-KivyApp().run()
+BrainDeadApp().run()
