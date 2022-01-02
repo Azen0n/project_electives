@@ -1,0 +1,27 @@
+<ListLine>:
+    padding: 30
+    spacing: 30
+    height: 50
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    Label:
+        id: line_label
+        color: 0, 0, 0, 1
+        size_hint_y: None
+        height: 60
+        text_size: self.size
+        valign: 'center'
+        pos_hint: { 'left': 0, 'center_y': 0.5 }
+
+    RippleElevationHoverButton:
+        id: line_button
+        size: 200, 50
+        pos_hint: { 'right': 1, 'center_y': 0.5 }
+        bg_color: 40/255, 167/255, 69/255, 255/255
+        elevation: 0
+        on_press: root.button_click(self)
