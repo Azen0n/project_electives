@@ -26,11 +26,6 @@ class ElectiveTextInput(TextInput):
         if len(self.text) < self.max_length:
             return super().insert_text(substring, from_undo=from_undo)
 
-
-class ImageButton(ButtonBehavior, Image):
-    pass
-
-
 class RippleElevationHoverButton(
     HoverButton,
     RectangularRippleBehavior,
