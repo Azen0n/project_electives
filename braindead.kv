@@ -1,0 +1,45 @@
+Menu:
+    orientation: 'horizontal'
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: None
+        width: 200
+
+        Button:
+            text: 'Меню администратора'
+            size_hint_y: None
+            height: 50
+            on_press: root.admin_menu_button_click()
+
+        BoxLayout:
+            orientation: 'vertical'
+
+    ExtendedScreenManager:
+        id: screen_manager
+
+        AdminMenuScreen
+        ElectiveCardScreen
+        SemesterListScreen
+        ElectiveListScreen
+        StatisticsScreen
+
+<AdminMenuScreen@Screen>
+    name: 'admin_menu'
+    AdminMenu
+
+<ElectiveCardScreen@Screen>
+    name: 'elective_card'
+    ElectiveCard
+
+<SemesterListScreen@Screen>
+    name: 'semester_list'
+    SemesterList
+
+<ElectiveListScreen@Screen>
+    name: 'elective_list'
+    ElectiveList
+
+<StatisticsScreen@Screen>
+    name: 'statistics'
+    Statistics
