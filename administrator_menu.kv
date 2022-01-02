@@ -11,6 +11,7 @@
 
         RippleElevationHoverButton:
             text: 'Статистика по элективам'
+            size: 400, 50
             bg_color: 40/255, 167/255, 69/255, 255/255
             on_press: root.statistics_button_click()
 
@@ -33,7 +34,6 @@
 
 <RippleElevationHoverButton>:
     size_hint: None, None
-    size: 400, 50
     elevation: 10
     radius: [self.height / 2]
     ripple_duration_in_slow: 0.3
