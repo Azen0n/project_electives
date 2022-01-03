@@ -23,6 +23,7 @@ Window.clearcolor = 0.98, 0.98, 0.98, 1
 
 screen_manager: ExtendedScreenManager
 
+dadadadadadadadad
 
 class AdminMenu(BoxLayout):
     def __init__(self, **kwargs):
