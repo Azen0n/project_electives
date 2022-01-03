@@ -1,0 +1,13 @@
+<AuthenticationScreen>
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        MDLabel:
+            text: "Вход"
+            size_hint_y:1
+            font_size: 40
+        MDTextField:
+            hint_text: "Введите свой id"
+            on_text_validate: root.enter(self)
+            size_hint_y:1
+            halign: 'center'
