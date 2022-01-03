@@ -44,3 +44,13 @@ class ListLine(RecycleKVIDsDataViewBehavior, BoxLayout):
     @staticmethod
     def button_click(button):
         button.root.line_button_callback(button)
+
+# FIXME: Объединить с ListLine
+class ListLine2(RecycleKVIDsDataViewBehavior, BoxLayout):
+    @staticmethod
+    def button_click(button):
+        button.root.line_button_callback(button)
+
+    @staticmethod
+    def button2_click(button):
+        button.root.line_button2_callback(button)
