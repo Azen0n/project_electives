@@ -23,7 +23,6 @@ Window.clearcolor = 0.98, 0.98, 0.98, 1
 
 screen_manager: ExtendedScreenManager
 
-dadadadadadadadad
 
 class AdminMenu(BoxLayout):
     def __init__(self, **kwargs):
@@ -205,6 +204,7 @@ class Menu(BoxLayout):
 class StudentMenu(BoxLayout):
     def __init__(self, **kwargs):
         super(StudentMenu, self).__init__(**kwargs)
+        self.button_afraided_of_being_banned = 'just some text to be var element'
 
     @staticmethod
     def open_list_screen(button):
@@ -215,8 +215,7 @@ class StudentMenu(BoxLayout):
                 screen_manager.display_screen(list_of_selected_day_screen,
                                               transition=SlideTransition(),
                                               direction='left')
-                button.disabled = True
-
+                StudentMenu.button_afraided_of_being_banned = button
                 # FIXME: Убрать обращение через children
                 ListOfSelectedDay.fill_list_of_selected_day(list_of_selected_day_screen.children[0])
                 break
@@ -224,6 +223,7 @@ class StudentMenu(BoxLayout):
 
 # FIXME: Объединить с SemestersList
 class ListOfSelectedDay(BoxLayout):
+
     @staticmethod
     def fill_list_of_selected_day(list_of_electives):
         # list_of_electives.ids.title.text = day
@@ -239,13 +239,16 @@ class ListOfSelectedDay(BoxLayout):
             for i in range(len(elective_code_list))]
 
     @staticmethod
+    def block_button():
+        StudentMenu.button_afraided_of_being_banned.disabled = True
+
+    @staticmethod
     def line_button_callback(button):
         elective_card_screen = screen_manager.get_screen('elective_card')
         screen_manager.display_screen(elective_card_screen,
                                       transition=SlideTransition(),
                                       direction='left')
         Window.set_system_cursor('arrow')
-
         elective_code = button.code
         elective_info = database_access.get_info_by_elective_code(elective_code)
         # FIXME: Убрать обращение через children
@@ -256,9 +259,11 @@ class ListOfSelectedDay(BoxLayout):
     def line_button2_callback(button):
         elective_code = button.code
         labels_list = screen_manager.get_screen('list_of_priorities').children[0].list_of_labels
+
         for i in range(len(labels_list)):
             if labels_list[i].text == '':
                 labels_list[i].text = elective_code
+                ListOfSelectedDay.block_button()
                 break
         ListOfSelectedDay.back_to_list()
 
