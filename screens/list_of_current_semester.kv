@@ -1,4 +1,9 @@
-<AdminMenu>:
+<ListOfCurrentSemesterScreen@Screen>
+    name: 'list_of_current_semester'
+    ListOfCurrentSemester
+
+
+<ListOfCurrentSemester>:
     orientation: 'vertical'
     recycleView: recycleView
 
@@ -9,10 +14,16 @@
         size_hint_y: None
         height: 120
 
+        canvas.before:
+            Color:
+                rgba: 43/255, 63/255, 105/255, 255/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
         Label:
             id: title
             text: 'Список элективов текущего семестра'
-            color: 0, 0, 0, 1
             font_size: 25
             height: self.parent.height
 
