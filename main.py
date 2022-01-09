@@ -12,6 +12,7 @@ Builder.load_file('administrator_menu.kv')
 Builder.load_file('elective_card.kv')
 Builder.load_file('statistics.kv')
 Builder.load_file('list_line.kv')
+Builder.load_file('components.kv')
 
 Builder.load_file('authentication_screen.kv')
 Builder.load_file('student_menu.kv')
@@ -30,13 +31,15 @@ class AdminMenu(BoxLayout):
         Clock.schedule_once(self._init_recycle_view)
 
     def _init_recycle_view(self, dt):
-        elective_code_list, elective_name_list = database_access.get_current_elective_codes_and_names()
+        elective_info_list = database_access.get_current_electives_info()
         self.recycleView.data = [
-            {'line_button.code': elective_code_list[i],
-             'line_label.text': elective_name_list[i],
+            {'line_button.code': str(elective_info_list[0][i]),
+             'name.text': str(elective_info_list[1][i]),
+             'hours.text': str(elective_info_list[2][i]),
+             'capacity.text': str(elective_info_list[3][i]),
              'line_button.text': 'Редактировать',
              'line_button.root': self}
-            for i in range(len(elective_code_list))]
+            for i in range(len(elective_info_list[0]))]
 
     @staticmethod
     def statistics_button_click():
@@ -77,6 +80,7 @@ class ElectiveCard(BoxLayout):
             self.back_list_name = 'list_of_selected_day'
         else:
             self.back_list_name = 'list_of_current_semester'
+
         self.ids.name.readonly = readonly
         self.ids.code.readonly = readonly
         self.ids.hours.readonly = readonly
@@ -88,8 +92,8 @@ class ElectiveCard(BoxLayout):
 
     @staticmethod
     def save_elective_info():
-        kek = screen_manager.get_screen('elective_card')
-        elective_card = kek.ids.elective_card
+        # FIXME: Убрать обращение через children
+        elective_card = screen_manager.get_screen('elective_card').children[0]
         elective_info = {
             'code': elective_card.ids.code,
             'name': elective_card.ids.name,
@@ -98,7 +102,7 @@ class ElectiveCard(BoxLayout):
             'in_charge': elective_card.ids.in_charge,
             'author': elective_card.ids.author,
             'annotation': elective_card.ids.annotation,
-            'footer_data': elective_card.ids.footer
+            'footer_date': elective_card.ids.footer
         }
 
         database_access.set_info_by_elective_code(elective_info)
@@ -120,7 +124,7 @@ class SemesterList(BoxLayout):
         semester_name_list = database_access.get_semesters()
         self.recycleView.data = [{
             'line_button.code': semester_name_list[i],
-            'line_label.text': semester_name_list[i],
+            'name.text': semester_name_list[i],
             'line_button.text': 'Открыть',
             'line_button.root': self
         } for i in range(len(semester_name_list))]
@@ -150,13 +154,15 @@ class ListOfSelectedSemester(BoxLayout):
     @staticmethod
     def fill_list_of_selected_semester(list_of_electives, semester):
         list_of_electives.ids.title.text = semester
-        elective_code_list, elective_name_list = database_access.get_elective_codes_and_names_by_semester(semester)
+        elective_info_list = database_access.get_electives_info_by_semester(semester)
         list_of_electives.ids.recycleView.data = [
-            {'line_button.code': elective_code_list[i],
-             'line_label.text': elective_name_list[i],
+            {'line_button.code': str(elective_info_list[0][i]),
+             'name.text': str(elective_info_list[1][i]),
+             'hours.text': str(elective_info_list[2][i]),
+             'capacity.text': str(elective_info_list[3][i]),
              'line_button.text': 'Открыть',
              'line_button.root': list_of_electives}
-            for i in range(len(elective_code_list))]
+            for i in range(len(elective_info_list[0]))]
 
     @staticmethod
     # Перемещает фокус на экран статистики и заполняет его
@@ -188,6 +194,11 @@ class Menu(BoxLayout):
     @staticmethod
     def admin_menu_button_click():
         screen_manager.display_screen('list_of_current_semester',
+                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+    @staticmethod
+    def statistics_button_click():
+        screen_manager.display_screen('semester_list',
                                       transition=RiseInTransition(clearcolor=Window.clearcolor))
 
     @staticmethod
@@ -226,11 +237,11 @@ class ListOfSelectedDay(BoxLayout):
     @staticmethod
     def fill_list_of_selected_day(list_of_electives):
         # list_of_electives.ids.title.text = day
-        elective_code_list, elective_name_list = database_access.get_current_elective_codes_and_names()
+        elective_code_list, elective_name_list = database_access.get_current_electives_info()
         list_of_electives.ids.recycleView.data = [
             {'line_button.code': elective_code_list[i],
              'line_button2.code': elective_code_list[i],
-             'line_label.text': elective_name_list[i],
+             'name.text': elective_name_list[i],
              'line_button.text': 'Описание',
              'line_button2.text': 'Добавить',
              'line_button.root': list_of_electives,
