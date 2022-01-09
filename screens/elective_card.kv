@@ -1,5 +1,9 @@
+<ElectiveCardScreen@Screen>
+    name: 'elective_card'
+    ElectiveCard
+
+
 <ElectiveCard>
-    id: elective_card
     orientation: 'vertical'
     size: root.width, root.height
     padding: 25
@@ -11,22 +15,22 @@
         size_hint_y: None
         height: 60
 
-        ImageButton:
-            source: 'images/left_arrow.png'
-            size_hint: None, None
-            size: self.parent.height, self.parent.height
-            on_press: root.back_to_list()
+        IconButton:
+            icon: 'images/left_arrow.png'
+            size: 60, 60
+            bg_color: 230/255, 242/255, 254/255, 255/255
+            on_release: root.back_to_list()
 
         ElectiveCardTextInput:
             id: name
             font_size: 25
-            height: self.parent.height
+            height: 60
 
-        ImageButton:
-            source: 'images/save.png'
-            size_hint: None, None
-            size: self.parent.height, self.parent.height
-            on_press: root.save_elective_info()
+        IconButton:
+            icon: 'images/save.png'
+            size: 60, 60
+            bg_color: 230/255, 242/255, 254/255, 255/255
+            on_release: root.save_elective_info()
 
     BoxLayout:
         orientation: 'vertical'
