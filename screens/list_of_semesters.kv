@@ -1,0 +1,44 @@
+<ListOfSemestersScreen@Screen>
+    name: 'list_of_semesters'
+    ListOfSemesters
+
+
+<ListOfSemesters>
+    orientation: 'vertical'
+    recycleView: recycleView
+
+    BoxLayout:
+        orientation: 'horizontal'
+        padding: 30
+        spacing: 20
+        size_hint_y: None
+        height: 120
+
+        IconButton:
+            icon: 'images/left_arrow.png'
+            size: 60, 60
+            bg_color: 230/255, 242/255, 254/255, 255/255
+            on_release: root.back_to_list()
+
+        Label:
+            id: title
+            text: 'Выберите семестр'
+            color: 0, 0, 0, 1
+            font_size: 25
+            height: self.parent.height
+
+    RecycleView:
+        id: recycleView
+        viewclass: 'ListLine'
+        scroll_type: ['bars']
+        scroll_wheel_distance: 100
+        bar_width: 10
+
+        RecycleBoxLayout:
+            orientation: 'vertical'
+            padding: 30
+            spacing: 10
+            default_size: None, 100
+            default_size_hint: 1, None
+            size_hint_y: None
+            height: self.minimum_height
