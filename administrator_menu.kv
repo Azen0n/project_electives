@@ -7,13 +7,14 @@
         padding: 30
         spacing: 10
         size_hint_y: None
-        height: self.minimum_height
+        height: 120
 
-        RippleElevationHoverButton:
-            text: 'Статистика по элективам'
-            size: 400, 50
-            bg_color: 40/255, 167/255, 69/255, 255/255
-            on_press: root.statistics_button_click()
+        Label:
+            id: title
+            text: 'Список элективов текущего семестра'
+            color: 0, 0, 0, 1
+            font_size: 25
+            height: self.parent.height
 
     RecycleView:
         id: recycleView
@@ -26,25 +27,7 @@
             orientation: 'vertical'
             padding: 30
             spacing: 10
-            default_size: None, 50
+            default_size: None, 100
             default_size_hint: 1, None
             size_hint_y: None
             height: self.minimum_height
-
-
-<RippleElevationHoverButton>:
-    size_hint: None, None
-    elevation: 10
-    radius: [self.height / 2]
-    ripple_duration_in_slow: 0.3
-
-    background_color: 0, 0, 0, 0
-    background_normal: ''
-    bg_color: 0, 0, 0, 1
-    canvas.before:
-        Color:
-            rgba: self.bg_color
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: [self.height / 2]
