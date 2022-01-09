@@ -1,11 +1,9 @@
-def get_current_elective_codes_and_names():
-    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре
-    elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
+def get_current_electives_info():
+    # TODO: Сделать запрос к БД, взять список элективов (их коды, активные часы, вместимость) в текущем семестре
+    elective_tuple_list = [(i, i + 1, 60, 20) for i in range(199)]  # Генерация данных
 
-    elective_code_and_name_lists = list(zip(*elective_tuple_list))
-    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
-    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
-    return elective_code_list, elective_name_list
+    elective_info_lists = list(zip(*elective_tuple_list))
+    return elective_info_lists
 
 
 def get_info_by_elective_code(code):
@@ -52,16 +50,14 @@ def get_semesters():
     return semester_list
 
 
-def get_elective_codes_and_names_by_semester(semester):
-    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в выбранном семестре
+def get_electives_info_by_semester(semester):
+    # TODO: Сделать запрос к БД, взять список элективов (их коды, активные часы, вместимость) в выбранном семестре
     semester_tuple = (semester[:4], semester[-1:-6])
 
-    elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
+    elective_tuple_list = [(i, i + 1, 60, 20) for i in range(199)]  # Генерация данных
 
-    elective_code_and_name_lists = list(zip(*elective_tuple_list))
-    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
-    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
-    return elective_code_list, elective_name_list
+    elective_info_lists = list(zip(*elective_tuple_list))
+    return elective_info_lists
 
 
 def get_statistics_by_elective_code(code):
