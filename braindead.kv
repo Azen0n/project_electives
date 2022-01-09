@@ -1,3 +1,5 @@
+#:import Gradient gradient.Gradient
+
 Menu:
     orientation: 'horizontal'
 
@@ -6,29 +8,39 @@ Menu:
         size_hint_x: None
         width: 200
 
+        canvas.before:
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                texture: Gradient.vertical((43/255, 63/255, 105/255, 255/255), (32/255, 77/255, 176/255, 255/255))
+
         Button:
             text: 'Меню администратора'
+            background_color: 0, 0, 0, 0
             size_hint_y: None
             height: 50
-            on_press: root.admin_menu_button_click()
+            on_release: root.admin_menu_button_click()
 
         Button:
             text: 'Статистика по элективам'
+            background_color: 0, 0, 0, 0
             size_hint_y: None
             height: 50
-            on_press: root.statistics_button_click()
+            on_release: root.statistics_button_click()
 
         Button:
             text: 'Меню студента'
+            background_color: 0, 0, 0, 0
             size_hint_y: None
             height: 50
-            on_press: root.student_menu_button_click()
+            on_release: root.student_menu_button_click()
 
         Button:
             text: 'Список приоритетов'
+            background_color: 0, 0, 0, 0
             size_hint_y: None
             height: 50
-            on_press: root.list_of_priorities_button_click()
+            on_release: root.list_of_priorities_button_click()
 
         BoxLayout:
             orientation: 'vertical'
@@ -36,44 +48,18 @@ Menu:
     ExtendedScreenManager:
         id: screen_manager
 
-        AdminMenuScreen
+        ListOfCurrentSemesterScreen
         ElectiveCardScreen
-        SemesterListScreen
+        ListOfSemestersScreen
         ListOfSelectedSemesterScreen
         StatisticsScreen
 
         StudentMenuScreen
         ListOfSelectedDayScreen
-        ListOfPrioritiesScreen
+        PrioritiesScreen
 
-<AdminMenuScreen@Screen>
-    name: 'list_of_current_semester'
-    AdminMenu
 
-<ElectiveCardScreen@Screen>
-    name: 'elective_card'
-    ElectiveCard
 
-<SemesterListScreen@Screen>
-    name: 'semester_list'
-    SemesterList
 
-<ListOfSelectedSemesterScreen@Screen>
-    name: 'list_of_selected_semester'
-    ListOfSelectedSemester
 
-<StatisticsScreen@Screen>
-    name: 'statistics'
-    Statistics
 
-<StudentMenuScreen@Screen>
-    name: 'student_menu'
-    StudentMenu
-
-<ListOfSelectedDayScreen@Screen>
-    name: 'list_of_selected_day'
-    ListOfSelectedDay
-
-<ListOfPrioritiesScreen@Screen>
-    name: 'list_of_priorities'
-    ListOfPriorities
