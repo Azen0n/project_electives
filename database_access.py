@@ -1,12 +1,4 @@
-def get_current_elective_codes_and_names():
-    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре
-    elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
-
-    elective_code_and_name_lists = list(zip(*elective_tuple_list))
-    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
-    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
-    return elective_code_list, elective_name_list
-
+#Запросы Димы
 
 def get_info_by_elective_code(code):
     # TODO: Сделать запрос к БД, взять информацию об элективе по его коду
@@ -80,3 +72,24 @@ def get_statistics_by_elective_code(code):
         'prioritization_by_grades': prioritization_by_grades_2d
     }
     return statistics
+
+
+#Запросы Ильи
+
+def get_current_elective_codes_and_names(day):
+    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре проходящие в этот день
+    elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
+    elective_code_and_name_lists = list(zip(*elective_tuple_list))
+    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
+    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
+    return elective_code_list, elective_name_list
+
+
+def authentication_by_id(aut_id):
+    # TODO: Сделать запрос к БД, проверить id и войти как студент или как администратор
+    pass
+
+
+def student_priorities(student_id, elective_code_list):
+    # TODO: Послать в БД данные: id студента и упорядоченный массив кодов его выбранных элективов
+    pass
