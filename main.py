@@ -1,3 +1,7 @@
+from kivy.uix.button import Button
+from kivy.uix.image import Image
+from kivy.uix.label import Label
+
 import components
 import database_access
 from extended_screen_manager import ExtendedScreenManager
@@ -204,7 +208,7 @@ class Menu(BoxLayout):
 class StudentMenu(BoxLayout):
     def __init__(self, **kwargs):
         super(StudentMenu, self).__init__(**kwargs)
-        self.button_afraided_of_being_banned = 'just some text to be var element'
+        self.day_of_button = 'just some text to be var element'
 
     @staticmethod
     def open_list_screen(button):
@@ -215,19 +219,20 @@ class StudentMenu(BoxLayout):
                 screen_manager.display_screen(list_of_selected_day_screen,
                                               transition=SlideTransition(),
                                               direction='left')
-                StudentMenu.button_afraided_of_being_banned = button
+                StudentMenu.day_of_button = button
                 # FIXME: Убрать обращение через children
-                ListOfSelectedDay.fill_list_of_selected_day(list_of_selected_day_screen.children[0])
+                ListOfSelectedDay.fill_list_of_selected_day(list_of_selected_day_screen.children[0], button.parent.children[1].text)
                 break
 
 
 # FIXME: Объединить с SemestersList
+
 class ListOfSelectedDay(BoxLayout):
 
     @staticmethod
-    def fill_list_of_selected_day(list_of_electives):
+    def fill_list_of_selected_day(list_of_electives, day_of_week):
         # list_of_electives.ids.title.text = day
-        elective_code_list, elective_name_list = database_access.get_current_elective_codes_and_names()
+        elective_code_list, elective_name_list = database_access.get_current_elective_codes_and_names(day_of_week)
         list_of_electives.ids.recycleView.data = [
             {'line_button.code': elective_code_list[i],
              'line_button2.code': elective_code_list[i],
@@ -261,9 +266,12 @@ class ListOfSelectedDay(BoxLayout):
         labels_list = screen_manager.get_screen('list_of_priorities').children[0].list_of_labels
 
         for i in range(len(labels_list)):
-            if labels_list[i].text == '':
+            if (labels_list[i].text == '') & (len(StudentMenu.day_of_button.parent.parent.children[0].children) < 3):
                 labels_list[i].text = elective_code
-                ListOfSelectedDay.block_button()
+                elective = ElectivePin()
+                StudentMenu.day_of_button.parent.parent.children[0].add_widget(elective)
+                elective.elective_text.text = elective_code
+                # ListOfSelectedDay.block_button()
                 break
         ListOfSelectedDay.back_to_list()
 
@@ -273,6 +281,15 @@ class ListOfSelectedDay(BoxLayout):
                                       transition=SlideTransition(),
                                       direction='right')
         Window.set_system_cursor('arrow')
+
+
+class ElectivePin(BoxLayout):
+    def __init__(self, **kwargs):
+        super(ElectivePin, self).__init__(**kwargs)
+        self.elective_text = self.ids.elective_name
+
+    def clear_elective(self):
+        self.remove_widget(self)
 
 
 class ListOfPriorities(BoxLayout):
@@ -295,7 +312,6 @@ class ListOfPriorities(BoxLayout):
             self.ids.fourthLine,
             self.ids.fifthLine
         ]
-        pass
 
     @staticmethod
     def button_down(button):

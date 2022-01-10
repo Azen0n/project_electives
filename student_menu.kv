@@ -1,71 +1,79 @@
-<StudentMenuButton@Button>
-    text: '+'
-    multiline: True
-    bold: True
-    border: 5,5,5,5
 <StudentMenuLabel@Label>
     color: 0, 0, 0, 1
 
-<BackgroundColor@Widget>
-    background_color: 1, 1, 1, 1
-    canvas.before:
-        Color:
-            rgba: root.background_color
-        Rectangle:
-            size: self.size
-            pos: self.pos
-<GradientLabel@Label+BackgroundColor>
-    background_color: 0.1,0.2,0.3,0.4
 
+<ReducedImageButton@ImageButton>
+    size_hint_x: 0.2
 <StudentMenu>
-    orientation: "horizontal"
+    orientation: 'horizontal'
     size: root.width, root.height
-    GridLayout:
-        cols:6
-        size: root.width, root.height
-        StudentMenuLabel:
-            text: "Понедельник"
-        StudentMenuLabel:
-            text: "Вторник"
-        StudentMenuLabel:
-            text: "Среда"
-        StudentMenuLabel:
-            text: "Четверг"
-        StudentMenuLabel:
-            text: "Пятница"
-        StudentMenuLabel:
-            text: "Суббота"
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Вторник'
+                size_hint_y:1
+                id: label_day
+            ReducedImageButton:
+                source: 'images/add_circular_outlined_button.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Среда'
+                size_hint_y:1
+            ReducedImageButton:
+                source: 'images/add_circular_outlined_button.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Четверг'
+                size_hint_y:1
+            ReducedImageButton:
+                source: 'images/add_circular_outlined_button.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Пятница'
+                size_hint_y:1
+            ReducedImageButton:
+                source: 'images/add_circular_outlined_button.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
 
-        GradientLabel
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        GradientLabel
-        GradientLabel
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        GradientLabel
-        GradientLabel
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        StudentMenuButton:
-            on_press: root.open_list_screen(self)
-        GradientLabel
+
+
+<ElectivePin>
+    orientation:'vertical'
+    BoxLayout:
+        orientation: 'horizontal'
+        height: 40
+        StudentMenuLabel:
+            id: elective_name
+        ReducedImageButton:
+            source: 'images/delete_button.png'
+            on_release: clear_elective()
+
 
 
 <ListOfPriorities>
@@ -75,13 +83,14 @@
         id: firstLine
         orientation:"horizontal"
         StudentMenuLabel:
+            text: "blablabla"
             id: first_priority
         ImageButton:
             source: 'images/down_arrow.png'
-            on_press: root.button_down(self)
+            on_release: root.button_down(self)
         ImageButton:
             source: 'images/delete_button.png'
-            on_press: root.delete_button(self)
+            on_release: root.delete_button(self)
     BoxLayout:
         orientation:"horizontal"
         id: secondLine
@@ -89,13 +98,13 @@
             id: second_priority
         ImageButton:
             source: 'images/up_arrow.png'
-            on_press: root.button_up(self)
+            on_release: root.button_up(self)
         ImageButton:
             source: 'images/down_arrow.png'
-            on_press: root.button_down(self)
+            on_release: root.button_down(self)
         ImageButton:
             source: 'images/delete_button.png'
-            on_press: root.delete_button(self)
+            on_release: root.delete_button(self)
     BoxLayout:
         orientation:"horizontal"
         id: thirdLine
@@ -103,13 +112,13 @@
             id: third_priority
         ImageButton:
             source: 'images/up_arrow.png'
-            on_press: root.button_up(self)
+            on_release: root.button_up(self)
         ImageButton:
             source: 'images/down_arrow.png'
-            on_press: root.button_down(self)
+            on_release: root.button_down(self)
         ImageButton:
             source: 'images/delete_button.png'
-            on_press: root.delete_button(self)
+            on_release: root.delete_button(self)
     BoxLayout:
         orientation:"horizontal"
         id: fourthLine
@@ -117,13 +126,13 @@
             id: fourth_priority
         ImageButton:
             source: 'images/up_arrow.png'
-            on_press: root.button_up(self)
+            on_release: root.button_up(self)
         ImageButton:
             source: 'images/down_arrow.png'
-            on_press: root.button_down(self)
+            on_release: root.button_down(self)
         ImageButton:
             source: 'images/delete_button.png'
-            on_press: root.delete_button(self)
+            on_release: root.delete_button(self)
     BoxLayout:
         orientation:"horizontal"
         id: fifthLine
@@ -131,10 +140,11 @@
             id: fifth_priority
         ImageButton:
             source: 'images/up_arrow.png'
-            on_press: root.button_up(self)
+            on_release: root.button_up(self)
         ImageButton:
             source: 'images/delete_button.png'
-            on_press: root.delete_button(self)
+            on_release: root.delete_button(self)
+
 
 <ListOfSelectedDay>
     orientation: 'vertical'
@@ -151,7 +161,7 @@
             source: 'images/left_arrow.png'
             size_hint: None, None
             size: 60, 60
-            on_press: root.back_to_list()
+            on_release: root.back_to_list()
 
         Label:
             id: title
