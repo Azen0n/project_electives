@@ -16,7 +16,7 @@ Builder.load_file('screens/list_of_selected_semester.kv')
 Builder.load_file('screens/statistics.kv')
 Builder.load_file('components.kv')
 
-Builder.load_file('screens/authentication_screen.kv')
+Builder.load_file('screens/authentication.kv')
 Builder.load_file('screens/student_menu.kv')
 Builder.load_file('screens/list_of_selected_day.kv')
 Builder.load_file('screens/priorities.kv')
