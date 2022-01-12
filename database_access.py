@@ -9,8 +9,7 @@ def get_current_electives_info():
     # TODO: Сделать запрос к БД, взять список элективов (их коды, активные часы, вместимость) в текущем семестре
     # done
     cursor.execute("""
-    SELECT DISTINCT Electives.code, Electives.electiveName FROM Electives
-    ORDER BY electiveName
+    select code, electiveName, hours, capacity from electives
 """)
     elective_tuple_list = cursor.fetchall()
     # elective_tuple_list = [(i, i + 1, 60, 20) for i in range(199)]  # Генерация данных
