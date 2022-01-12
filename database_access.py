@@ -1,5 +1,5 @@
 import psycopg2
-
+#Свои данные сюда
 conn = psycopg2.connect(host='localhost', user='univer', password='univer', dbname='project_bd')
 cursor = conn.cursor()
 
