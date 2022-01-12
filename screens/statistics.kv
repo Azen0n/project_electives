@@ -1,0 +1,134 @@
+<StatisticsScreen@Screen>
+    name: 'statistics'
+    Statistics
+
+
+<Statistics>
+    orientation: 'vertical'
+
+    BoxLayout:
+        orientation: 'horizontal'
+        padding: 30
+        spacing: 20
+        size_hint_y: None
+        height: 120
+
+        IconButton:
+            icon: 'images/left_arrow.png'
+            size: 60, 60
+            bg_color: 230/255, 242/255, 254/255, 255/255
+            on_release: root.back_to_list()
+
+        Label:
+            id: title
+            text: 'Статистика'
+            color: 0, 0, 0, 1
+            font_size: 25
+            height: self.parent.height
+
+    BoxLayout:
+        padding: 15, 7.5
+        spacing: 15
+
+        StatBoxLayout:
+            IconButton:
+                icon: 'images/number_1.png'
+                size: 50, 50
+                bg_color: 230/255, 242/255, 254/255, 255/255
+                pos_hint: { 'left': 1, 'center_y': 0.5 }
+
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Первый приоритет'
+                StatVarLabel:
+                    id: first
+        StatBoxLayout:
+            IconButton:
+                icon: 'images/number_2.png'
+                size: 50, 50
+                bg_color: 230/255, 242/255, 254/255, 255/255
+                pos_hint: { 'left': 1, 'center_y': 0.5 }
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Второй приоритет'
+                StatVarLabel:
+                    id: second
+        StatBoxLayout:
+            IconButton:
+                icon: 'images/number_3.png'
+                size: 50, 50
+                bg_color: 230/255, 242/255, 254/255, 255/255
+                pos_hint: { 'left': 1, 'center_y': 0.5 }
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Третий приоритет'
+                StatVarLabel:
+                    id: third
+        StatBoxLayout:
+            IconButton:
+                icon: 'images/number_4.png'
+                size: 50, 50
+                bg_color: 230/255, 242/255, 254/255, 255/255
+                pos_hint: { 'left': 1, 'center_y': 0.5 }
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Четвертый приоритет'
+                StatVarLabel:
+                    id: fourth
+        StatBoxLayout:
+            IconButton:
+                icon: 'images/number_5.png'
+                size: 50, 50
+                bg_color: 230/255, 242/255, 254/255, 255/255
+                pos_hint: { 'left': 1, 'center_y': 0.5 }
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Пятый приоритет'
+                StatVarLabel:
+                    id: fifth
+
+    BoxLayout:
+        padding: 15, 7.5
+        spacing: 15
+
+        StatBoxLayout:
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Средняя оценка студента'
+                StatVarLabel:
+                    id: average_score
+        StatBoxLayout:
+            RelativeLayout:
+                StatTitleLabel:
+                    text: 'Средний приоритет'
+                StatVarLabel:
+                    id: average_priority
+
+
+<StatBoxLayout@BoxLayout>
+    orientation: 'horizontal'
+    padding: 15
+    spacing: 15
+    size_hint_y: None
+    height: 110
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+
+<StatTitleLabel@Label>
+    font_size: 10
+    text_size: self.size
+    valign: 'center'
+    pos_hint: {'left': 1, 'center_y': 0.65}
+    color: 150/255, 150/255, 150/255, 255/255
+
+<StatVarLabel@Label>
+    font_size: 25
+    text_size: self.size
+    valign: 'center'
+    pos_hint: {'left': 1, 'center_y': 0.35}
+    color: 0, 0, 0, 1

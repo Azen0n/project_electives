@@ -1,0 +1,116 @@
+#:import pyperclip pyperclip
+
+
+<ElectiveCardLabel@Label>
+    bold: True
+    size_hint_y: None
+    height: 30
+    color: 0, 0, 0, 1
+    background_color: 0.98, 0.98, 0.98, 1
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+
+<ElectiveCardTextInput>
+    size_hint_y: None
+    height: 30
+    halign: 'center'
+    padding_y: [(self.height - self.line_height) / 2.0, 0]
+    cursor_color: 0, 0, 0, 1
+    multiline: False
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+            width: 1
+
+
+<HoverButton>:
+    size_hint: None, None
+    elevation: 0
+    radius: [self.height / 2]
+    ripple_duration_in_slow: 0.3
+
+    background_color: 0, 0, 0, 0
+    background_normal: ''
+    bg_color: 0, 0, 0, 1
+    canvas.before:
+        Color:
+            rgba: self.bg_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [self.height / 2]
+
+
+<IconButton@HoverButton>
+    icon: ''
+
+    Image:
+        source: root.icon
+        center_x: root.center_x
+        center_y: root.center_y
+        size: root.size[0] * 0.5, root.size[1] * 0.5
+
+
+<ListLine>:
+    padding: 30
+    spacing: 20
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    IconButton:
+        icon: 'images/clipboard.png'
+        size: 50, 50
+        bg_color: 240/255, 240/255, 240/255, 255/255
+        pos_hint: { 'left': 0, 'center_y': 0.5 }
+        on_release: pyperclip.copy(root.ids.name.text)
+
+    LineLabel:
+        id: name
+        size_hint_max_x: None
+        size_hint_min_x: 50
+
+    LineLabel:
+        id: hours
+
+    LineLabel:
+        id: capacity
+
+    IconButton:
+        id: line_open_button
+        icon: 'images/search.png'
+        size: 50, 50
+        pos_hint: { 'right': 1, 'center_y': 0.5 }
+        bg_color: 230/255, 242/255, 254/255, 255/255
+        on_release: root.open_button_click(self)
+
+    HoverButton:
+        id: line_button
+        size: 200, 50
+        pos_hint: { 'right': 1, 'center_y': 0.5 }
+        color: 77/255, 121/255, 168/255, 255/255
+        bg_color: 230/255, 242/255, 254/255, 255/255
+        bold: True
+        on_release: root.button_click(self)
+
+
+<LineLabel@Label>
+    color: 0, 0, 0, 1
+    size_hint_y: None
+    height: root.height
+    size_hint_max_x: 100
+    size_hint_min_x: 20
+    text_size: self.size
+    valign: 'center'
+    pos_hint: { 'left': 0, 'center_y': 0.5 }

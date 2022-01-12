@@ -1,0 +1,44 @@
+<ListOfCurrentSemesterScreen@Screen>
+    name: 'list_of_current_semester'
+    ListOfCurrentSemester
+
+
+<ListOfCurrentSemester>:
+    orientation: 'vertical'
+    recycleView: recycleView
+
+    BoxLayout:
+        orientation: 'horizontal'
+        padding: 30
+        spacing: 10
+        size_hint_y: None
+        height: 120
+
+        canvas.before:
+            Color:
+                rgba: 43/255, 63/255, 105/255, 255/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        Label:
+            id: title
+            text: 'Список элективов текущего семестра'
+            font_size: 25
+            height: self.parent.height
+
+    RecycleView:
+        id: recycleView
+        viewclass: 'ListLine'
+        scroll_type: ['bars']
+        scroll_wheel_distance: 100
+        bar_width: 10
+
+        RecycleBoxLayout:
+            orientation: 'vertical'
+            padding: 30
+            spacing: 10
+            default_size: None, 100
+            default_size_hint: 1, None
+            size_hint_y: None
+            height: self.minimum_height

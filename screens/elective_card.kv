@@ -1,37 +1,9 @@
-<ElectiveLabel@Label>
-    bold: True
-    size_hint_y: None
-    height: 30
-    color: 0, 0, 0, 1
-    background_color: 0.98, 0.98, 0.98, 1
-    canvas.before:
-        Color:
-            rgba: self.background_color
-        Rectangle:
-            size: self.size
-            pos: self.pos
-
-<ImageButton@ButtonBehavior+Image>
-
-
-<ElectiveTextInput>
-    size_hint_y: None
-    height: 30
-    halign: 'center'
-    padding_y: [(self.height - self.line_height) / 2.0, 0]
-    cursor_color: 0, 0, 0, 1
-    multiline: False
-    background_normal: ''
-    canvas.before:
-        Color:
-            rgba: 0, 0, 0, 1
-        Line:
-            rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
-            width: 1
+<ElectiveCardScreen@Screen>
+    name: 'elective_card'
+    ElectiveCard
 
 
 <ElectiveCard>
-    id: elective_card
     orientation: 'vertical'
     size: root.width, root.height
     padding: 25
@@ -43,22 +15,22 @@
         size_hint_y: None
         height: 60
 
-        ImageButton:
-            source: 'images/left_arrow.png'
-            size_hint: None, None
-            size: self.parent.height, self.parent.height
-            on_press: root.back_to_list()
+        IconButton:
+            icon: 'images/left_arrow.png'
+            size: 60, 60
+            bg_color: 230/255, 242/255, 254/255, 255/255
+            on_release: root.back_to_list()
 
-        ElectiveTextInput:
+        ElectiveCardTextInput:
             id: name
             font_size: 25
-            height: self.parent.height
+            height: 60
 
-        ImageButton:
-            source: 'images/save_button.png'
-            size_hint: None, None
-            size: self.parent.height, self.parent.height
-            on_press: root.save_elective_info()
+        IconButton:
+            icon: 'images/save.png'
+            size: 60, 60
+            bg_color: 230/255, 242/255, 254/255, 255/255
+            on_release: root.save_elective_info()
 
     BoxLayout:
         orientation: 'vertical'
@@ -71,39 +43,39 @@
             size_hint_y: None
             height: 65
 
-            ElectiveLabel:
+            ElectiveCardLabel:
                 text: 'Код'
                 size_hint_x: 3
-            ElectiveLabel:
+            ElectiveCardLabel:
                 text: 'Ак. часы'
                 size_hint_x: 1
-            ElectiveLabel:
+            ElectiveCardLabel:
                 text: 'Кол-во мест'
                 size_hint_x: 1.5
-            ElectiveLabel:
+            ElectiveCardLabel:
                 text: 'Ответственный'
                 size_hint_x: 4
-            ElectiveLabel:
+            ElectiveCardLabel:
                 text: 'Авторы'
                 size_hint_x: 4
 
-            ElectiveTextInput:
+            ElectiveCardTextInput:
                 id:code
-            ElectiveTextInput:
+            ElectiveCardTextInput:
                 max_length: 3
                 id: hours
-            ElectiveTextInput:
+            ElectiveCardTextInput:
                 max_length: 3
                 id: max_students
-            ElectiveTextInput:
+            ElectiveCardTextInput:
                 id: in_charge
-            ElectiveTextInput:
+            ElectiveCardTextInput:
                 id: author
 
         BoxLayout:
             orientation: 'vertical'
 
-            ElectiveLabel:
+            ElectiveCardLabel:
                 text: 'Аннотация'
                 font_size: 20
                 height: 40
@@ -120,7 +92,7 @@
                         rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
                         width: 1
 
-        ElectiveLabel:
+        ElectiveCardLabel:
             id: footer
             color: 0.4, 0.4, 0.4, 1
             font_size: 12

@@ -1,0 +1,72 @@
+<PrioritiesScreen@Screen>
+    name: 'priorities'
+    Priorities
+
+
+<Priorities>
+    orientation: "vertical"
+    size: root.width, root.height
+    BoxLayout:
+        id: firstLine
+        orientation:"horizontal"
+        StudentMenuLabel:
+            id: first_priority
+        IconButton:
+            icon: 'images/down_arrow.png'
+            on_release: root.button_down(self)
+        IconButton:
+            icon: 'images/delete.png'
+            on_release: root.delete_button(self)
+    BoxLayout:
+        orientation:"horizontal"
+        id: secondLine
+        StudentMenuLabel:
+            id: second_priority
+        IconButton:
+            icon: 'images/up_arrow.png'
+            on_release: root.button_up(self)
+        IconButton:
+            icon: 'images/down_arrow.png'
+            on_release: root.button_down(self)
+        IconButton:
+            icon: 'images/delete.png'
+            on_release: root.delete_button(self)
+    BoxLayout:
+        orientation:"horizontal"
+        id: thirdLine
+        StudentMenuLabel:
+            id: third_priority
+        IconButton:
+            icon: 'images/up_arrow.png'
+            on_release: root.button_up(self)
+        IconButton:
+            icon: 'images/down_arrow.png'
+            on_release: root.button_down(self)
+        IconButton:
+            icon: 'images/delete.png'
+            on_release: root.delete_button(self)
+    BoxLayout:
+        orientation:"horizontal"
+        id: fourthLine
+        StudentMenuLabel:
+            id: fourth_priority
+        IconButton:
+            icon: 'images/up_arrow.png'
+            on_release: root.button_up(self)
+        IconButton:
+            icon: 'images/down_arrow.png'
+            on_release: root.button_down(self)
+        IconButton:
+            icon: 'images/delete.png'
+            on_release: root.delete_button(self)
+    BoxLayout:
+        orientation:"horizontal"
+        id: fifthLine
+        StudentMenuLabel:
+            id: fifth_priority
+        IconButton:
+            icon: 'images/up_arrow.png'
+            on_release: root.button_up(self)
+        IconButton:
+            icon: 'images/delete.png'
+            on_release: root.delete_button(self)
