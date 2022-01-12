@@ -49,10 +49,12 @@ def set_info_by_elective_code(info):
     # done
     cursor.execute(f"""
     UPDATE Electives
-	SET electivename='{info['name']}', capacity='{info['capacity']}', hours='{info['hours']}', 
-	incharge='{info['in_charge']}', author='{info['author']}', annotation='{info['annotation']}', dateofchange='{info['footer_date']}'
+	SET electivename='{info['name']}', capacity='{info['capacity']}', hours='{info['hours']}',
+        incharge='{info['in_charge']}', author='{info['author']}', annotation='{info['annotation']}',
+        dateofchange='{info['footer_data']}'
 	WHERE code='{info['code']}';
         """)
+    print(info)
     conn.commit()
     code = info['code']
     info_list = [

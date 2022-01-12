@@ -23,8 +23,6 @@ Window.clearcolor = 0.98, 0.98, 0.98, 1
 
 screen_manager: ExtendedScreenManager
 
-dadadadadadadadad
-
 class AdminMenu(BoxLayout):
     def __init__(self, **kwargs):
         super(AdminMenu, self).__init__(**kwargs)
@@ -89,8 +87,7 @@ class ElectiveCard(BoxLayout):
 
     @staticmethod
     def save_elective_info():
-        kek = screen_manager.get_screen('elective_card')
-        elective_card = kek.ids.elective_card
+        elective_card = screen_manager.get_screen('elective_card').children[0]
         elective_info = {
             'code': elective_card.ids.code,
             'name': elective_card.ids.name,
