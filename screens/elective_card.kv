@@ -5,72 +5,87 @@
 
 <ElectiveCard>
     orientation: 'vertical'
-    size: root.width, root.height
-    padding: 25
-    spacing: 15
 
     BoxLayout:
         orientation: 'horizontal'
+        padding: 30
         spacing: 20
         size_hint_y: None
-        height: 60
+        height: 120
+        canvas.before:
+            Color:
+                rgba: 43/255, 63/255, 105/255, 255/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
 
         IconButton:
             icon: 'images/left_arrow.png'
             size: 60, 60
-            bg_color: 230/255, 242/255, 254/255, 255/255
+            bg_color: 30/255, 40/255, 78/255, 255/255
             on_release: root.back_to_list()
 
-        ElectiveCardTextInput:
-            id: name
-            font_size: 25
-            height: 60
+        TextInputBackground:
+            ElectiveCardTextInput:
+                id: name
+                font_size: 25
 
         IconButton:
             icon: 'images/save.png'
             size: 60, 60
-            bg_color: 230/255, 242/255, 254/255, 255/255
+            bg_color: 30/255, 40/255, 78/255, 255/255
             on_release: root.save_elective_info()
 
     BoxLayout:
         orientation: 'vertical'
         spacing: 10
-        padding: 30, 0
+        padding: 30, 0, 30, 10
 
         GridLayout:
-            cols: 5
+            rows: 2
             spacing: 15, 5
             size_hint_y: None
             height: 65
 
             ElectiveCardLabel:
                 text: 'Код'
-                size_hint_x: 3
+                size_hint_x: 2
             ElectiveCardLabel:
                 text: 'Ак. часы'
                 size_hint_x: 1
             ElectiveCardLabel:
                 text: 'Кол-во мест'
-                size_hint_x: 1.5
+                size_hint_x: 1
+
+            TextInputBackground:
+                ElectiveCardTextInput:
+                    id:code
+            TextInputBackground:
+                ElectiveCardTextInput:
+                    id: hours
+                    max_length: 3
+            TextInputBackground:
+                ElectiveCardTextInput:
+                    id: max_students
+                    max_length: 3
+
+        GridLayout:
+            rows: 2
+            spacing: 15, 5
+            size_hint_y: None
+            height: 65
+
             ElectiveCardLabel:
                 text: 'Ответственный'
-                size_hint_x: 4
             ElectiveCardLabel:
                 text: 'Авторы'
-                size_hint_x: 4
 
-            ElectiveCardTextInput:
-                id:code
-            ElectiveCardTextInput:
-                max_length: 3
-                id: hours
-            ElectiveCardTextInput:
-                max_length: 3
-                id: max_students
-            ElectiveCardTextInput:
-                id: in_charge
-            ElectiveCardTextInput:
-                id: author
+            TextInputBackground:
+                ElectiveCardTextInput:
+                    id: in_charge
+            TextInputBackground:
+                ElectiveCardTextInput:
+                    id: author
 
         BoxLayout:
             orientation: 'vertical'
@@ -80,17 +95,12 @@
                 font_size: 20
                 height: 40
 
-            TextInput:
-                id: annotation
-                multiline: True
-                cursor_color: 0, 0, 0, 1
-                background_normal: ''
-                canvas.before:
-                    Color:
-                        rgba: 0, 0, 0, 1
-                    Line:
-                        rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
-                        width: 1
+            TextInputBackground:
+                ElectiveCardTextInput:
+                    id: annotation
+                    multiline: True
+                    halign: 'left'
+                    pos_hint: { 'top': 1 }
 
         ElectiveCardLabel:
             id: footer

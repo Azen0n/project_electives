@@ -10,10 +10,8 @@
     BoxLayout:
         orientation: 'horizontal'
         padding: 30
-        spacing: 10
         size_hint_y: None
         height: 120
-
         canvas.before:
             Color:
                 rgba: 43/255, 63/255, 105/255, 255/255
@@ -24,8 +22,8 @@
         Label:
             id: title
             text: 'Список элективов текущего семестра'
+            bold: True
             font_size: 25
-            height: self.parent.height
 
     RecycleView:
         id: recycleView
