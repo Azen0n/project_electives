@@ -1,20 +1,25 @@
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.lang import Builder
 from kivy.core.window import Window
+from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.screenmanager import RiseInTransition, SlideTransition
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
 
-import components
 import database_access
+from components import IconButton, MenuButton
 from extended_screen_manager import ExtendedScreenManager
+
+Builder.load_file('screens/start_menu.kv')
+Builder.load_file('screens/main_app.kv')
+Builder.load_file('components.kv')
 
 Builder.load_file('screens/list_of_current_semester.kv')
 Builder.load_file('screens/elective_card.kv')
 Builder.load_file('screens/list_of_semesters.kv')
 Builder.load_file('screens/list_of_selected_semester.kv')
 Builder.load_file('screens/statistics.kv')
-Builder.load_file('components.kv')
+Builder.load_file('screens/algorithm.kv')
 
 Builder.load_file('screens/authentication.kv')
 Builder.load_file('screens/student_menu.kv')
@@ -146,13 +151,6 @@ class ListOfSemesters(BoxLayout):
         semester = button.code
         list_of_selected_semester_screen.children[0].fill_list_of_selected_semester(semester)
 
-    @staticmethod
-    def back_to_list():
-        screen_manager.display_screen('list_of_current_semester',
-                                      transition=SlideTransition(),
-                                      direction='right')
-        Window.set_system_cursor('arrow')
-
 
 class ListOfSelectedSemester(BoxLayout):
     def fill_list_of_selected_semester(self, semester):
@@ -191,6 +189,8 @@ class ListOfSelectedSemester(BoxLayout):
 
 class Statistics(BoxLayout):
     def fill_statistics(self, statistics):
+        # self.ids.title.text = str(statistics['name'])
+
         self.ids.average_score.text = str(statistics['average_grade'])
         self.ids.average_priority.text = str(statistics['average_priority'])
 
@@ -200,9 +200,6 @@ class Statistics(BoxLayout):
         self.ids.fourth.text = str(statistics['prioritization'][3])
         self.ids.fifth.text = str(statistics['prioritization'][4])
 
-
-
-
     @staticmethod
     def back_to_list():
         screen_manager.display_screen('list_of_selected_semester',
@@ -211,26 +208,11 @@ class Statistics(BoxLayout):
         Window.set_system_cursor('arrow')
 
 
-class Menu(BoxLayout):
+class Algorithm(RelativeLayout):
     @staticmethod
-    def admin_menu_button_click():
-        screen_manager.display_screen('list_of_current_semester',
-                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
-
-    @staticmethod
-    def statistics_button_click():
-        screen_manager.display_screen('list_of_semesters',
-                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
-
-    @staticmethod
-    def student_menu_button_click():
-        screen_manager.display_screen('student_menu',
-                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
-
-    @staticmethod
-    def list_of_priorities_button_click():
-        screen_manager.display_screen('priorities',
-                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+    def start_distribution():
+        # TODO: Добавить запуск алгортима распределения
+        pass
 
 
 class StudentMenu(BoxLayout):
@@ -350,15 +332,93 @@ class Priorities(BoxLayout):
                 list_of_priorities_screen.list_of_labels[i].text = ''
 
 
+class StartMenuScreenManager(ExtendedScreenManager):
+    pass
+
+
+class StartMenu(RelativeLayout):
+    @staticmethod
+    def start_student(start_screen_manager):
+        main_app = start_screen_manager.get_screen('main_app').children[0]
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Выбор элективов',
+                                MainApp.student_menu_button_click)
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Приоритеты',
+                                MainApp.priorities_button_click)
+        main_app.ids.icon_box.add_widget(BoxLayout())
+        main_app.ids.text_box.add_widget(BoxLayout())
+        main_app.ids.screen_manager.display_screen('student_menu',
+                                                   transition=NoTransition())
+        StartMenu.change_to_main_app(start_screen_manager)
+
+    @staticmethod
+    def start_administrator(start_screen_manager):
+        main_app = start_screen_manager.get_screen('main_app').children[0]
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Текущий семестр',
+                                MainApp.list_of_current_semester_button_click)
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Статистика',
+                                MainApp.statistics_button_click)
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Алгоритм',
+                                MainApp.algorithm_button_click)
+        main_app.ids.icon_box.add_widget(BoxLayout())
+        main_app.ids.text_box.add_widget(BoxLayout())
+        StartMenu.change_to_main_app(start_screen_manager)
+
+    @staticmethod
+    def add_menu_line(menu, icon_path, name, button_click):
+        menu.ids.icon_box.add_widget(IconButton(icon=icon_path,
+                                                size=(50, 50),
+                                                on_release=button_click))
+        menu.ids.text_box.add_widget(MenuButton(text=name,
+                                                size_hint=(1, None),
+                                                on_release=button_click))
+
+    @staticmethod
+    def change_to_main_app(start_screen_manager: ExtendedScreenManager):
+        global screen_manager
+        screen_manager = start_screen_manager.get_screen('main_app').children[0].ids.screen_manager
+        start_screen_manager.display_screen('main_app',
+                                            transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+
+class MainApp(BoxLayout):
+    def list_of_current_semester_button_click(self):
+        screen_manager.display_screen('list_of_current_semester',
+                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+    def statistics_button_click(self):
+        screen_manager.display_screen('list_of_semesters',
+                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+    def algorithm_button_click(self):
+        screen_manager.display_screen('algorithm',
+                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+    def student_menu_button_click(self):
+        screen_manager.display_screen('student_menu',
+                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+    def priorities_button_click(self):
+        screen_manager.display_screen('priorities',
+                                      transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+
 screen_manager: ExtendedScreenManager
 
 
 class BrainDeadApp(App):
     def build(self):
         self.title = '内部で死んでいる'
-        self.icon = 'images/braindead_logo.png'
-        global screen_manager
-        screen_manager = self.root.ids.screen_manager
+        return StartMenuScreenManager()
 
 
 BrainDeadApp().run()
