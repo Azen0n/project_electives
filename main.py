@@ -32,6 +32,44 @@ Window.minimum_height = 600
 Window.clearcolor = 242 / 255, 242 / 255, 242 / 255, 255 / 255
 
 
+class ListOfCurrentSemester(BoxLayout):
+    def __init__(self, **kwargs):
+        super(ListOfCurrentSemester, self).__init__(**kwargs)
+        Clock.schedule_once(self._init_recycle_view)
+
+    def _init_recycle_view(self, dt):
+        elective_info_list = database_access.get_current_electives_info()
+        self.recycleView.data = [
+            {'line_button.code': str(elective_info_list[0][i]),
+             'name.text': str(elective_info_list[1][i]),
+             'hours.text': str(elective_info_list[2][i]),
+             'capacity.text': str(elective_info_list[3][i]),
+             'line_open_button.size': (0, 0),
+             'line_button.text': 'Редактировать',
+             'line_button.root': self}
+            for i in range(len(elective_info_list[0]))]
+
+    @staticmethod
+    def statistics_button_click():
+        screen_manager.display_screen('list_of_semesters',
+                                      transition=SlideTransition(),
+                                      direction='left')
+        Window.set_system_cursor('arrow')
+
+    @staticmethod
+    def line_button_callback(button):
+        elective_card_screen = screen_manager.get_screen('elective_card')
+        screen_manager.display_screen(elective_card_screen,
+                                      transition=SlideTransition(),
+                                      direction='left')
+        Window.set_system_cursor('arrow')
+
+        elective_code = button.code
+        elective_info = database_access.get_info_by_elective_code(elective_code)
+        elective_card_screen.children[0].fill_card_with_info(elective_info)
+        elective_card_screen.children[0].change_text_input_to(False)
+
+
 class ElectiveCard(BoxLayout):
     def __init__(self, **kwargs):
         super(ElectiveCard, self).__init__(**kwargs)
