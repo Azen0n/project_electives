@@ -1,0 +1,55 @@
+#:import Gradient gradient.Gradient
+
+<StartMenuScreenManager>
+    StartMenuScreen
+    MainAppScreen
+
+
+<StartMenuScreen@Screen>
+    name: 'start_menu'
+    StartMenu
+
+
+<StartMenu>
+    canvas.before:
+        Rectangle:
+            size: self.size
+            pos: 0, 0
+            texture: Gradient.vertical((43/255, 63/255, 105/255, 255/255), (32/255, 77/255, 176/255, 255/255))
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: None, None
+        size: 300, 300
+        spacing: 10
+        padding: 30
+        pos_hint: { 'center_x': 0.5, 'center_y': 0.5 }
+        canvas.before:
+            Color:
+                rgba: 30/255, 40/255, 78/255, 255/255
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [10]
+
+        Label:
+            text: 'Выберите пользователя'
+            font_size: 18
+
+        HoverButton:
+            text: 'Студент'
+            size: 200, 50
+            font_size: 18
+            border_radius: [10]
+            bg_color: 32/255, 77/255, 176/255, 255/255
+            pos_hint: { 'center_x': 0.5 }
+            on_release: root.start_student(app.root)
+
+        HoverButton:
+            text: 'Администратор'
+            size: 200, 50
+            font_size: 18
+            border_radius: [10]
+            bg_color: 32/255, 77/255, 176/255, 255/255
+            pos_hint: { 'center_x': 0.5 }
+            on_release: root.start_administrator(app.root)
