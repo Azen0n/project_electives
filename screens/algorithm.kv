@@ -1,0 +1,48 @@
+<AlgorithmScreen@Screen>
+    name: 'algorithm'
+    Algorithm
+
+
+<Algorithm>
+    canvas.before:
+        Color:
+            rgba: 32/255, 77/255, 176/255, 255/255
+        Rectangle:
+            size: self.size
+            pos: 0, 0
+        Color:
+            rgba: 30/255, 40/255, 78/255, 255/255
+        Line:
+            width: 2
+            points: 0, 0, 0, self.height
+
+    RelativeLayout:
+        size_hint: None, None
+        size: 300, 300
+        pos_hint: { 'center_x': 0.5, 'center_y': 0.5 }
+        canvas.before:
+            Color:
+                rgba: 30/255, 40/255, 78/255, 255/255
+            RoundedRectangle:
+                size: self.size
+                pos: 0, 0
+                radius: [10]
+
+        Label:
+            text: 'Начать распределение студентов по элективам?'
+            size_hint: None, None
+            size: 250, 100
+            text_size: self.size
+            valign: 'center'
+            halign: 'center'
+            font_size: 18
+            pos_hint: { 'center_x': 0.5, 'center_y': 0.65 }
+
+        HoverButton:
+            text: 'Запустить'
+            size: 200, 50
+            border_radius: [10]
+            font_size: 18
+            bg_color: 32/255, 77/255, 176/255, 255/255
+            pos_hint: { 'center_x': 0.5, 'center_y': 0.35 }
+            on_release: root.start_distribution
