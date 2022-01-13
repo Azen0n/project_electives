@@ -1,0 +1,73 @@
+<StudentMenuScreen@Screen>
+    name: 'student_menu'
+    StudentMenu
+
+
+<StudentMenu>
+    orientation: "horizontal"
+    size: root.width, root.height
+    GridLayout:
+        cols:6
+        size: root.width, root.height
+        StudentMenuLabel:
+            text: "Понедельник"
+        StudentMenuLabel:
+            text: "Вторник"
+        StudentMenuLabel:
+            text: "Среда"
+        StudentMenuLabel:
+            text: "Четверг"
+        StudentMenuLabel:
+            text: "Пятница"
+        StudentMenuLabel:
+            text: "Суббота"
+
+        StudentMenuButton:
+            disabled: True
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton
+            disabled: True
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            disabled: True
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            disabled: True
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            disabled: True
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            on_release: root.open_list_screen(self)
+        StudentMenuButton:
+            disabled: True
+            on_release: root.open_list_screen(self)
+
+
+<StudentMenuButton@Button>
+    text: '+'
+
+<StudentMenuLabel@Label>
+    color: 0, 0, 0, 1
