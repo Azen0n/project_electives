@@ -145,3 +145,30 @@ group by Electives.code, Electives.electiveName
         'prioritization_by_grades': prioritization_by_grades_2d
     }
     return statistics
+def get_current_elective_codes_and_names(day):
+    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре проходящие в этот день
+    # elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
+    cursor.execute(f"""
+    Select Electives.code, Electives.electiveName from Electives
+    join electivegroupsdatatable as gr on Electives.electiveID = gr.electiveID
+    where gr.day = '{day}'
+                    """)
+    elective_tuple_list = cursor.fetchall()
+    elective_code_and_name_lists = list(zip(*elective_tuple_list))
+    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
+    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
+    return elective_code_list, elective_name_list
+
+
+def authentication_by_id(aut_id):
+    # TODO: Сделать запрос к БД, проверить id и войти как студент или как администратор
+    cursor.execute(f"""
+    SELECT 1 FROM students WHERE studentID = '{aut_id}'
+                    """)
+    user = cursor.fetchall()
+    return user
+
+
+def student_priorities(student_id, elective_code_list):
+    # TODO: Послать в БД данные: id студента и упорядоченный массив кодов его выбранных элективов
+    pass
