@@ -138,18 +138,24 @@ def get_statistics_by_elective_code(semester, code):
 
 
 def get_current_elective_codes_and_names(day):
-    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре проходящие в этот день
+    gr_day = 2
+    if day == 'Среда':
+        gr_day = 3
+    elif day == 'Четверг':
+        gr_day = 4
+    elif day == 'Пятница':
+        gr_day = 5
+
     cursor.execute(f"""
-        SELECT electives.code, electives.electiveName
+        SELECT electives.code, electives.electiveName, electives.hours, electives.capacity
         FROM electives
             JOIN elective_groups_datatable AS gr ON electives.electiveID = gr.electiveID
-        WHERE gr.day = '{day}'
+        WHERE gr.day = '{gr_day}'
         """)
     elective_tuple_list = cursor.fetchall()
-    elective_code_and_name_lists = list(zip(*elective_tuple_list))
-    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
-    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
-    return elective_code_list, elective_name_list
+
+    elective_info_lists = list(zip(*elective_tuple_list))
+    return elective_info_lists
 
 
 def authentication_by_id(aut_id):

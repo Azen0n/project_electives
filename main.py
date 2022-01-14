@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
@@ -174,8 +175,10 @@ class ListOfSelectedSemester(BoxLayout):
                                       direction='left')
         Window.set_system_cursor('arrow')
 
+        # TODO: Добавить получение семестра
+        semester = '2001 год, осень'
         elective_code = button.code
-        elective_statistics = database_access.get_statistics_by_elective_code(elective_code)
+        elective_statistics = database_access.get_statistics_by_elective_code(semester, elective_code)
         statistics_screen.children[0].fill_statistics(elective_statistics)
 
     @staticmethod
@@ -362,7 +365,7 @@ class StartMenu(RelativeLayout):
         StartMenu.add_menu_line(main_app,
                                 'images/braindead_logo.png',
                                 'Приоритеты',
-                                MainApp.priorities_button_click)
+                                Factory.PriorityPopup().open)
         main_app.ids.icon_box.add_widget(BoxLayout())
         main_app.ids.text_box.add_widget(BoxLayout())
         main_app.ids.screen_manager.display_screen('student_menu',

@@ -2,72 +2,78 @@
     name: 'student_menu'
     StudentMenu
 
-
-<StudentMenu>
-    orientation: "horizontal"
-    size: root.width, root.height
-    GridLayout:
-        cols:6
-        size: root.width, root.height
-        StudentMenuLabel:
-            text: "Понедельник"
-        StudentMenuLabel:
-            text: "Вторник"
-        StudentMenuLabel:
-            text: "Среда"
-        StudentMenuLabel:
-            text: "Четверг"
-        StudentMenuLabel:
-            text: "Пятница"
-        StudentMenuLabel:
-            text: "Суббота"
-
-        StudentMenuButton:
-            disabled: True
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton
-            disabled: True
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            disabled: True
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            disabled: True
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            disabled: True
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            on_release: root.open_list_screen(self)
-        StudentMenuButton:
-            disabled: True
-            on_release: root.open_list_screen(self)
-
-
 <StudentMenuButton@Button>
     text: '+'
 
 <StudentMenuLabel@Label>
     color: 0, 0, 0, 1
+
+<StudentMenu>
+    orientation: 'horizontal'
+    size: root.width, root.height
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Вторник'
+                size_hint_y: 1
+                id: label_day
+            IconButton:
+                icon: 'images/plus_in_circle.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Среда'
+                size_hint_y:1
+            IconButton:
+                icon: 'images/plus_in_circle.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Четверг'
+                size_hint_y:1
+            IconButton:
+                icon: 'images/plus_in_circle.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            StudentMenuLabel:
+                text: 'Пятница'
+                size_hint_y:1
+            IconButton:
+                icon: 'images/plus_in_circle.png'
+                on_release: root.open_list_screen(self)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y:5
+
+
+
+<ElectivePin>
+    orientation:'vertical'
+    BoxLayout:
+        orientation: 'horizontal'
+        height: 40
+        StudentMenuLabel:
+            id: elective_name
+        IconButton:
+            icon: 'images/delete_button.png'
+            on_release: clear_elective()
