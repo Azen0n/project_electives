@@ -1,6 +1,6 @@
 import psycopg2
 #Свои данные сюда
-conn = psycopg2.connect(host='localhost', user='univer', password='univer', dbname='project_bd')
+conn = psycopg2.connect(host='localhost', user='postgres', password='89058539346Dds', dbname='electives')
 cursor = conn.cursor()
 
 
@@ -9,7 +9,7 @@ def get_current_electives_info():
     # TODO: Сделать запрос к БД, взять список элективов (их коды, активные часы, вместимость) в текущем семестре
     # done
     cursor.execute("""
-    select code, electiveName, hours, capacity from electives
+    select code, electiveName, hours, capacity from Electives
 """)
     elective_tuple_list = cursor.fetchall()
     # elective_tuple_list = [(i, i + 1, 60, 20) for i in range(199)]  # Генерация данных

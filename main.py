@@ -83,8 +83,7 @@ class ElectiveCard(BoxLayout):
         self.ids.in_charge.text = info['in_charge']
         self.ids.author.text = info['author']
         self.ids.annotation.text = info['annotation']
-        self.ids.footer.text = 'Создан черновик: {0} | Отправлено на согласование: {0} | Опубликован: {0} ({1})' \
-            .format(info['footer_date'], info['author'])
+        self.ids.footer.text = info['footer_date']
 
     def change_text_input_to(self, readonly: bool):
         if readonly:
