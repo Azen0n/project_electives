@@ -1,11 +1,29 @@
-#Запросы Димы
+import psycopg2
+
+connection = psycopg2.connect(host='localhost', user='postgres', password='89058539346Dds', dbname='electives')
+cursor = connection.cursor()
+
+
+def get_current_electives_info():
+    cursor.execute("""
+        SELECT code, electiveName, hours, capacity
+        FROM electives
+        """)
+    elective_tuple_list = cursor.fetchall()
+
+    elective_info_lists = list(zip(*elective_tuple_list))
+    return elective_info_lists
+
 
 def get_info_by_elective_code(code):
-    # TODO: Сделать запрос к БД, взять информацию об элективе по его коду
-    info_tuple = (0, 1, 2, 3, 4, 5, 6, 7)  # Генерация данных
+    cursor.execute(f"""
+        SELECT code, electivename, capacity, hours, incharge, author, annotation, dateofchange
+        FROM electives
+        WHERE code = '{code}'
+        """)
+    info_tuple = cursor.fetchall()
 
-    string_info_tuple = list(map(str, info_tuple))
-
+    string_info_tuple = list(map(str, info_tuple[0]))
     info = {
         'code': string_info_tuple[0],
         'name': string_info_tuple[1],
@@ -20,65 +38,114 @@ def get_info_by_elective_code(code):
 
 
 def set_info_by_elective_code(info):
-    # TODO: Сделать запрос к БД, отдать измененые данные
-    code = info['code']
-    info_list = [
-        info['name'],
-        info['capacity'],
-        info['hours'],
-        info['in_charge'],
-        info['author'],
-        info['annotation'],
-        info['footer_date']
-    ]
+    cursor.execute(f"""
+        UPDATE electives
+        SET electivename='{info['name']}',
+            capacity='{info['capacity']}',
+            hours='{info['hours']}',
+            incharge='{info['in_charge']}',
+            author='{info['author']}',
+            annotation='{info['annotation']}',
+            dateofchange='{info['footer_data']}'
+        WHERE code='{info['code']}';
+        """)
+    connection.commit()
 
 
 def get_semesters():
-    # TODO: Сделать запрос к БД, взять список семестров
-    semester_tuple_list = []  # Генерация данных
-    for i in range(2001, 2021):  # Генерация данных
-        semester_tuple_list.append((str(i), 'осень'))  # Генерация данных
-        semester_tuple_list.append((str(i + 1), 'весна'))  # Генерация данных
+    cursor.execute(f"""
+        SELECT yearofpassage, semester
+        FROM selected_electives
+        GROUP BY yearofpassage, semester
+        """)
+    semester_tuple_list = cursor.fetchall()
 
-    semester_list = [item[0] + ' год, ' + item[1] for item in semester_tuple_list]
+    semester_list = [str(item[0]) + ' год, ' + item[1] for item in semester_tuple_list]
     return semester_list
 
 
-def get_elective_codes_and_names_by_semester(semester):
-    # TODO: Сделать запрос к БД, взять список элективов (и их коды) в выбранном семестре
-    semester_tuple = (semester[:4], semester[-1:-6])
+def get_electives_info_by_semester(semester):
+    year, season = semester[:4], semester[-1:-6]
 
-    elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
+    cursor.execute(f"""
+        SELECT DISTINCT electives.code, electives.electiveName
+        FROM selected_electives
+            JOIN electives ON selected_electives.electiveID = electives.eLectiveID
+        WHERE yearofpassage = '{year}' AND semester = '{season}'
+        """)
+    elective_tuple_list = cursor.fetchall()
 
-    elective_code_and_name_lists = list(zip(*elective_tuple_list))
-    elective_code_list = list(map(str, elective_code_and_name_lists[0]))
-    elective_name_list = list(map(str, elective_code_and_name_lists[1]))
-    return elective_code_list, elective_name_list
+    elective_info_lists = list(zip(*elective_tuple_list))
+    return elective_info_lists
 
 
-def get_statistics_by_elective_code(code):
-    # TODO: Сделать запрос к БД, взять статистику об выбранном элективе по его коду
-    average_grade = 4.45  # Генерация данных
-    average_priority = 2.2  # Генерация данных
-    prioritization = [2, 6, 7, 7, 3]  # Генерация данных
+def get_statistics_by_elective_code(semester, code):
+    year, season = semester[:4], semester[-1:-6]
+
+    # Возвращает имя электива по его коду
+    cursor.execute(f"""
+        SELECT electiveName
+        FROM electives
+        WHERE code = {code}
+        """)
+    elective_name = cursor.fetchall()
+
+    # Возвращает среднюю оценку для электива в определенном семестре
+    cursor.execute(f"""
+        SELECT CAST(AVG(Students.perfomance) AS numeric(3, 2)) AS num
+        FROM selected_electives 
+            JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
+            JOIN Students ON selected_electives.studentID = Students.studentID
+        WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
+        """)
+    average_grade = cursor.fetchall()
+
+    # Возвращает средний приоритет для электива в определенном семестре
+    cursor.execute(f"""
+        SELECT CAST(AVG(priority) AS numeric(3, 2)) AS num
+        FROM selected_electives 
+            JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
+        WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
+        """)
+    average_priority = cursor.fetchall()
+
+    # Возвращает список с количеством людей для каждого приоритета для электива в определенном семестре
+    cursor.execute(f"""
+        SELECT selected_electives.priority, Count(*) AS num 
+        FROM selected_electives
+            JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
+        WHERE yearofpassage = {year} AND semester = {season} AND Electives.code = {code}
+        GROUP BY selected_electives.priority
+        """)
+    prioritization_bd = cursor.fetchall()
+
+    prioritization = [0] * 5
+    for priority in prioritization_bd:
+        prioritization[priority[0] - 1] = priority[1]
+
+    #############
     prioritization_by_grades_1d = [0, 0, 2, 2, 0, 1, 0, 2, 1, 1, 1, 5, 3, 0, 1, 0, 1, 0, 4, 1]  # Генерация данных
-
     prioritization_by_grades_2d = [[prioritization_by_grades_1d[i:i + 5:] for i in range(0, 4 * 5, 5)]]
 
     statistics = {
-        'average_grade': average_grade,
-        'average_priority': average_priority,
+        'name': str(elective_name),
+        'average_grade': float(average_grade),
+        'average_priority': float(average_priority),
         'prioritization': prioritization,
         'prioritization_by_grades': prioritization_by_grades_2d
     }
     return statistics
 
 
-#Запросы Ильи
-
 def get_current_elective_codes_and_names(day):
     # TODO: Сделать запрос к БД, взять список элективов (и их коды) в текущем семестре проходящие в этот день
-    elective_tuple_list = [(i, i + 1) for i in range(199)]  # Генерация данных
+    cursor.execute(f"""
+        SELECT electives.code, electives.electiveName
+        FROM electives
+            JOIN elective_groups_datatable AS gr ON electives.electiveID = gr.electiveID
+        WHERE gr.day = '{day}'
+        """)
+    elective_tuple_list = cursor.fetchall()
     elective_code_and_name_lists = list(zip(*elective_tuple_list))
     elective_code_list = list(map(str, elective_code_and_name_lists[0]))
     elective_name_list = list(map(str, elective_code_and_name_lists[1]))
@@ -87,7 +154,13 @@ def get_current_elective_codes_and_names(day):
 
 def authentication_by_id(aut_id):
     # TODO: Сделать запрос к БД, проверить id и войти как студент или как администратор
-    pass
+    cursor.execute(f"""
+        SELECT 1
+        FROM students
+        WHERE studentID = '{aut_id}'
+        """)
+    user = cursor.fetchall()
+    return user
 
 
 def student_priorities(student_id, elective_code_list):
