@@ -1,0 +1,67 @@
+#:import Factory kivy.factory.Factory
+
+
+<PriorityPopup@Popup>
+    auto_dismiss: True
+    size_hint: 0.5, 0.5
+    title: "Расставьте элективы по приоритетам"
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Первый приоритет"
+            id: first_priority
+        Label:
+            text: "Второй приоритет"
+            id: second_priority
+        Label:
+            text: "Третий приоритет"
+            id: third_priority
+        Label:
+            text: "Четвертый приоритет"
+            id: fourth_priority
+        Label:
+            text: "Пятый приоритет"
+            id: fifth_priority
+
+Menu:
+    orientation: 'horizontal'
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: None
+        width: 200
+
+        Button:
+            text: 'Меню администратора'
+            size_hint_y: None
+            height: 50
+            on_release: root.admin_menu_button_click()
+
+        Button:
+            text: 'Меню студента'
+            size_hint_y: None
+            height: 50
+            on_release: root.student_menu_button_click()
+
+        Button:
+            text: 'Список приоритетов'
+            size_hint_y: None
+            height: 50
+            on_release: root.list_of_priorities_button_click()
+        Button:
+            text: 'Popup'
+            size_hint_y: None
+            height: 50
+            on_release: Factory.PriorityPopup().open()
+
+        BoxLayout:
+            orientation: 'vertical'
+
+    ExtendedScreenManager:
+        id: screen_manager
+
+        AdminMenuScreen
+        ElectiveCardScreen
+        SemesterListScreen
+        ListOfSelectedSemesterScreen
+        StatisticsScreen
