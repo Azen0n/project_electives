@@ -188,7 +188,7 @@ class ListOfSelectedSemester(BoxLayout):
 
 class Statistics(BoxLayout):
     def fill_statistics(self, statistics):
-        # self.ids.title.text = str(statistics['name'])
+        self.ids.title.text = str(statistics['name'])
 
         self.ids.average_score.text = str(statistics['average_grade'])
         self.ids.average_priority.text = str(statistics['average_priority'])
