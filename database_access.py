@@ -17,23 +17,6 @@ def get_current_electives_info():
     return elective_info_lists
 
 
-def not_distribution():
-    cursor.execute("""
-        SELECT COUNT(*)
-        FROM electives
-        """)
-    number_of_electives = cursor.fetchall()[0][0]
-
-    weekdays = ['Вторник', 'Среда', 'Четверг', 'Пятница']
-    for i in range(number_of_electives):
-        day_number = randint(2, 5)
-        cursor.execute(f"""
-            INSERT INTO elective_groups_datatable(electiveid, groupid, day)
-            VALUES ({i + 1}, {day_number - 2}, '{weekdays[day_number - 2]}')
-            """)
-    connection.commit()
-
-
 def get_info_by_elective_code(code):
     cursor.execute(f"""
         SELECT code, electivename, capacity, hours, incharge, author, annotation, dateofchange
