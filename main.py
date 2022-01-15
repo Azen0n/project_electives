@@ -7,6 +7,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
 
+import algorithm
 import database_access
 from components import IconButton, MenuButton
 from extended_screen_manager import ExtendedScreenManager
@@ -204,7 +205,7 @@ class Statistics(BoxLayout):
 class Algorithm(RelativeLayout):
     @staticmethod
     def start_distribution():
-        database_access.not_distribution()
+        algorithm.distribution()
 
 
 class StudentMenu(BoxLayout):
