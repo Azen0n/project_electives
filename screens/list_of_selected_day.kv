@@ -10,21 +10,26 @@
     BoxLayout:
         orientation: 'horizontal'
         padding: 30
-        spacing: 20
         size_hint_y: None
         height: 120
+        canvas.before:
+            Color:
+                rgba: 43/255, 63/255, 105/255, 255/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
 
         IconButton:
             icon: 'images/left_arrow.png'
             size: 60, 60
+            bg_color: 30/255, 40/255, 78/255, 255/255
             on_release: root.back_to_list()
 
         Label:
             id: title
             text: 'Выберите электив'
-            color: 0, 0, 0, 1
+            bold: True
             font_size: 25
-            height: self.parent.height
 
     RecycleView:
         id: recycleView
