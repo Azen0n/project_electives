@@ -59,16 +59,7 @@ class ListOfCurrentSemester(BoxLayout):
 
     @staticmethod
     def line_button_callback(button):
-        elective_card_screen = screen_manager.get_screen('elective_card')
-        screen_manager.display_screen(elective_card_screen,
-                                      transition=SlideTransition(),
-                                      direction='left')
-        Window.set_system_cursor('arrow')
-
-        elective_code = button.code
-        elective_info = database_access.get_info_by_elective_code(elective_code)
-        elective_card_screen.children[0].fill_card_with_info(elective_info)
-        elective_card_screen.children[0].change_text_input_to(False)
+        ListOfSelectedDay.line_open_button_callback(button, readonly=False)
 
 
 class ElectiveCard(BoxLayout):
@@ -255,7 +246,7 @@ class ListOfSelectedDay(BoxLayout):
         StudentMenu.button_afraided_of_being_banned.disabled = True
 
     @staticmethod
-    def line_open_button_callback(button):
+    def line_open_button_callback(button, readonly=True):
         elective_card_screen = screen_manager.get_screen('elective_card')
         screen_manager.display_screen(elective_card_screen,
                                       transition=SlideTransition(),
@@ -265,7 +256,7 @@ class ListOfSelectedDay(BoxLayout):
         elective_code = button.code
         elective_info = database_access.get_info_by_elective_code(elective_code)
         elective_card_screen.children[0].fill_card_with_info(elective_info)
-        elective_card_screen.children[0].change_text_input_to(True)
+        elective_card_screen.children[0].change_text_input_to(readonly)
 
     @staticmethod
     def line_button_callback(button):
