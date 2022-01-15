@@ -71,5 +71,9 @@ class MenuButton(HoverButton):
 
 class ListLine(RecycleKVIDsDataViewBehavior, BoxLayout):
     @staticmethod
+    def open_button_click(button):
+        button.root.line_open_button_callback(button)
+
+    @staticmethod
     def button_click(button):
         button.root.line_button_callback(button)

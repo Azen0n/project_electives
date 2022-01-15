@@ -213,8 +213,7 @@ class Statistics(BoxLayout):
 class Algorithm(RelativeLayout):
     @staticmethod
     def start_distribution():
-        # TODO: Добавить запуск алгортима распределения
-        pass
+        database_access.not_distribution()
 
 
 class StudentMenu(BoxLayout):
@@ -246,7 +245,7 @@ class ListOfSelectedDay(BoxLayout):
              'name.text': str(elective_info_list[1][i]),
              'hours.text': str(elective_info_list[2][i]),
              'capacity.text': str(elective_info_list[3][i]),
-             'line_button.text': 'Описание',
+             'line_button.text': 'Добавить',
              'line_button.root': list_of_electives,
              'line_open_button.root': list_of_electives}
             for i in range(len(elective_info_list[0]))]
@@ -256,7 +255,7 @@ class ListOfSelectedDay(BoxLayout):
         StudentMenu.button_afraided_of_being_banned.disabled = True
 
     @staticmethod
-    def line_button_callback(button):
+    def line_open_button_callback(button):
         elective_card_screen = screen_manager.get_screen('elective_card')
         screen_manager.display_screen(elective_card_screen,
                                       transition=SlideTransition(),
@@ -269,7 +268,7 @@ class ListOfSelectedDay(BoxLayout):
         elective_card_screen.children[0].change_text_input_to(True)
 
     @staticmethod
-    def line_button2_callback(button):
+    def line_button_callback(button):
         elective_code = button.code
         labels_list = screen_manager.get_screen('priorities').children[0].list_of_labels
         for i in range(len(labels_list)):

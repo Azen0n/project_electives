@@ -1,3 +1,5 @@
+from random import randint
+
 import psycopg2
 
 connection = psycopg2.connect(host='localhost', user='postgres', password='89058539346Dds', dbname='electives')
@@ -13,6 +15,23 @@ def get_current_electives_info():
 
     elective_info_lists = list(zip(*elective_tuple_list))
     return elective_info_lists
+
+
+def not_distribution():
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM electives
+        """)
+    number_of_electives = cursor.fetchall()[0][0]
+
+    weekdays = ['Вторник', 'Среда', 'Четверг', 'Пятница']
+    for i in range(number_of_electives):
+        day_number = randint(2, 5)
+        cursor.execute(f"""
+            INSERT INTO elective_groups_datatable(electiveid, groupid, day)
+            VALUES ({i + 1}, {day_number - 2}, '{weekdays[day_number - 2]}')
+            """)
+    connection.commit()
 
 
 def get_info_by_elective_code(code):
@@ -60,8 +79,8 @@ def get_semesters():
         """)
     semester_tuple_list = cursor.fetchall()
 
-    semester_list = [str(item[0]) + ' год, ' + item[1] for item in semester_tuple_list]
-    return semester_list
+    list_of_semesters = [str(item[0]) + ' год, ' + item[1] for item in semester_tuple_list]
+    return list_of_semesters
 
 
 def get_electives_info_by_semester(semester):
@@ -92,7 +111,7 @@ def get_statistics_by_elective_code(semester, code):
 
     # Возвращает среднюю оценку для электива в определенном семестре
     cursor.execute(f"""
-        SELECT CAST(AVG(Students.perfomance) AS numeric(3, 2)) AS num
+        SELECT CAST(AVG(Students.perfomance) AS NUMERIC(3, 2))
         FROM selected_electives 
             JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
             JOIN Students ON selected_electives.studentID = Students.studentID
@@ -102,8 +121,8 @@ def get_statistics_by_elective_code(semester, code):
 
     # Возвращает средний приоритет для электива в определенном семестре
     cursor.execute(f"""
-        SELECT CAST(AVG(priority) AS numeric(3, 2)) AS num
-        FROM selected_electives 
+        SELECT CAST(AVG(priority) AS NUMERIC(3, 2))
+        FROM selected_electives
             JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
         WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
         """)
@@ -111,7 +130,7 @@ def get_statistics_by_elective_code(semester, code):
 
     # Возвращает список с количеством людей для каждого приоритета для электива в определенном семестре
     cursor.execute(f"""
-        SELECT selected_electives.priority, Count(*) AS num 
+        SELECT selected_electives.priority, COUNT(*) AS number_of_elections 
         FROM selected_electives
             JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
         WHERE yearofpassage = {year} AND semester = {season} AND Electives.code = {code}
@@ -138,19 +157,11 @@ def get_statistics_by_elective_code(semester, code):
 
 
 def get_current_elective_codes_and_names(day):
-    gr_day = 2
-    if day == 'Среда':
-        gr_day = 3
-    elif day == 'Четверг':
-        gr_day = 4
-    elif day == 'Пятница':
-        gr_day = 5
-
     cursor.execute(f"""
         SELECT electives.code, electives.electiveName, electives.hours, electives.capacity
         FROM electives
-            JOIN elective_groups_datatable AS gr ON electives.electiveID = gr.electiveID
-        WHERE gr.day = '{gr_day}'
+            JOIN elective_groups_datatable ON electives.electiveID = elective_groups_datatable.electiveID
+        WHERE elective_groups_datatable.day = '{day}'
         """)
     elective_tuple_list = cursor.fetchall()
 
@@ -158,12 +169,11 @@ def get_current_elective_codes_and_names(day):
     return elective_info_lists
 
 
-def authentication_by_id(aut_id):
-    # TODO: Сделать запрос к БД, проверить id и войти как студент или как администратор
+def authentication_by_id(auth_id):
     cursor.execute(f"""
         SELECT 1
         FROM students
-        WHERE studentID = '{aut_id}'
+        WHERE studentID = '{auth_id}'
         """)
     user = cursor.fetchall()
     return user
