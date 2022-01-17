@@ -105,14 +105,14 @@ class ElectiveCard(BoxLayout):
         if not button.disabled:
             elective_card = screen_manager.get_screen('elective_card').children[0]
             elective_info = {
-                'code': elective_card.ids.code,
-                'name': elective_card.ids.name,
-                'hours': elective_card.ids.hours,
-                'capacity': elective_card.ids.max_students,
-                'in_charge': elective_card.ids.in_charge,
-                'author': elective_card.ids.author,
-                'annotation': elective_card.ids.annotation,
-                'footer_date': elective_card.ids.footer
+                'code': elective_card.ids.code.text,
+                'name': elective_card.ids.name.text,
+                'hours': elective_card.ids.hours.text,
+                'capacity': elective_card.ids.max_students.text,
+                'in_charge': elective_card.ids.in_charge.text,
+                'author': elective_card.ids.author.text,
+                'annotation': elective_card.ids.annotation.text,
+                'footer_date': elective_card.ids.footer.text
             }
 
             database_access.set_info_by_elective_code(elective_info)
