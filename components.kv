@@ -132,14 +132,26 @@
 <DragLabel>
     drop_func: root.swap()
     failed_drop_func: root.fail()
-    size_hint: None, None
+    color: 0, 0, 0, 1
+    canvas.before:
+        Color:
+            rgba: 245/255, 245/255, 245/255, 255/255
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10]
 
 
 <PriorityPopup>
+    background: ''
     auto_dismiss: True
     size_hint: 0.5, 0.5
     title: "Расставьте элективы по приоритетам"
+    title_color: 0, 0, 0, 1
+    title_size: 18
     BoxLayout:
+        padding: 15
+        spacing: 10
         orientation: 'vertical'
         DragLabel:
             id: first_priority

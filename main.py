@@ -32,7 +32,7 @@ Builder.load_file('screens/list_of_selected_day.kv')
 Window.size = 1280, 720
 Window.minimum_width = 800
 Window.minimum_height = 600
-Window.clearcolor = 242 / 255, 242 / 255, 242 / 255, 255 / 255
+Window.clearcolor = 235 / 255, 235 / 255, 235 / 255, 255 / 255
 
 
 class ListOfCurrentSemester(BoxLayout):
