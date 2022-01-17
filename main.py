@@ -312,11 +312,7 @@ class ElectivePin(RelativeLayout):
         self.parent.remove_widget(self)
 
     def see_description(self, button):
-        ListOfSelectedDay.line_open_button_callback(self)
-
-
-class StartMenuScreenManager(ExtendedScreenManager):
-    pass
+        ListOfSelectedDay.line_open_button_callback(button, True)
 
 
 class DragLabel(Label, DragNDropWidget):
@@ -349,6 +345,10 @@ class PriorityPopup(Popup):
 
     def open_popup(self):
         self.open()
+
+
+class StartMenuScreenManager(ExtendedScreenManager):
+    pass
 
 
 class StartMenu(RelativeLayout):
