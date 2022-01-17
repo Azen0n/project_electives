@@ -6,74 +6,124 @@
     text: '+'
 
 <StudentMenuLabel@Label>
+    size_hint: 2, None
+    height: 30
     color: 0, 0, 0, 1
+    font_size:25
+    pos_hint: { 'center_y': 0.5 }
 
-<StudentMenu>
+<DayBoxLayout@BoxLayout>
+    size:225, 600
+    canvas.before:
+        Color:
+            rgba: 239/255, 242/255, 247/255, 255/255
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    padding: 20
+
+<ListBoxLayout@BoxLayout>
+    orientation: 'vertical'
+    size_hint_y:5
+    spacing:10
+
+<TopBoxLayout>
+    box_text: ''
     orientation: 'horizontal'
-    size: root.width, root.height
+    height: self.minimum_height
+    size_hint_y: None
+    StudentMenuLabel:
+        text: root.box_text
+    IconButton:
+        icon_size: self.size
+        size: 40, 40
+        icon: 'images/plus_in_circle.png'
+        on_release: root.open_list_screen(self)
+<StudentMenu>
+    canvas.before:
+        Rectangle:
+            size: self.size
+            pos: 0, 0
     BoxLayout:
         orientation: 'vertical'
-        BoxLayout:
-            orientation: 'horizontal'
-            StudentMenuLabel:
-                text: 'Вторник'
-                size_hint_y: 1
-                id: label_day
-            IconButton:
-                icon: 'images/plus_in_circle.png'
-                on_release: root.open_list_screen(self)
-        BoxLayout:
+        size_hint: None, None
+        size: root.width, 200
+        pos_hint: { 'center_x': 0.5, 'center_y': 0.9 }
+        canvas.before:
+            Color:
+                rgba: 4/255, 19/255, 60/255, 255/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: "Меню студента"
+            font_size: 30
+    RelativeLayout:
+        size_hint: None, None
+        size: root.width, 700
+        pos_hint: { 'center_x': 0.5, 'center_y': 0.38 }
+        canvas.before:
+            Color:
+                rgba: 200/255, 200/255, 200/255, 200/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        DayBoxLayout:
+            size_hint: None, None
+            pos_hint: { 'center_x': 0.15, 'center_y': 0.55 }
             orientation: 'vertical'
-            size_hint_y:5
-    BoxLayout:
-        orientation: 'vertical'
-        BoxLayout:
-            orientation: 'horizontal'
-            StudentMenuLabel:
-                text: 'Среда'
-                size_hint_y:1
-            IconButton:
-                icon: 'images/plus_in_circle.png'
-                on_release: root.open_list_screen(self)
-        BoxLayout:
+            TopBoxLayout:
+                box_text: 'Вторник'
+            ListBoxLayout
+        DayBoxLayout:
+            size_hint: None, None
+            pos_hint: { 'center_x': 0.3875, 'center_y': 0.55 }
             orientation: 'vertical'
-            size_hint_y:5
-    BoxLayout:
-        orientation: 'vertical'
-        BoxLayout:
-            orientation: 'horizontal'
-            StudentMenuLabel:
-                text: 'Четверг'
-                size_hint_y:1
-            IconButton:
-                icon: 'images/plus_in_circle.png'
-                on_release: root.open_list_screen(self)
-        BoxLayout:
+            TopBoxLayout:
+                box_text: 'Среда'
+            ListBoxLayout
+        DayBoxLayout:
+            size_hint: None, None
+            pos_hint: { 'center_x': 0.625, 'center_y': 0.55 }
             orientation: 'vertical'
-            size_hint_y:5
-    BoxLayout:
-        orientation: 'vertical'
-        BoxLayout:
-            orientation: 'horizontal'
-            StudentMenuLabel:
-                text: 'Пятница'
-                size_hint_y:1
-            IconButton:
-                icon: 'images/plus_in_circle.png'
-                on_release: root.open_list_screen(self)
-        BoxLayout:
+            TopBoxLayout:
+                box_text: 'Четверг'
+            ListBoxLayout
+        DayBoxLayout:
+            size_hint: None, None
+            pos_hint: { 'center_x': 0.8625, 'center_y': 0.55 }
             orientation: 'vertical'
-            size_hint_y:5
+            TopBoxLayout:
+                box_text: 'Пятница'
+            ListBoxLayout
 
 
 
 <ElectivePin>
-    orientation:'vertical'
-    BoxLayout:
-        orientation: 'horizontal'
-        height: 40
-        StudentMenuLabel:
-            id: elective_name
-        IconButton:
-            icon: 'images/delete.png'
-            on_release: clear_elective()
+    size_hint: 1, None
+    height:150
+    canvas.before:
+        Color:
+            rgba: 255/255, 255/255, 255/255, 255/255
+        Rectangle:
+            size: self.size
+            pos: 0, 0
+    Label:
+        id: elective_name
+        valign: 'top'
+        color: 0, 0, 0, 1
+        size_hint_x: 0.8
+        text_size: self.size
+        pos_hint: {  'center_x': 0.45, 'top': 0.95 }
+    IconButton:
+        size: 50,50
+        pos_hint: {  'center_x': 0.9, 'center_y': 0.9  }
+        icon: 'images/delete.png'
+        on_release: root.clear_elective(self)
+    HoverButton:
+        text: "Описание"
+        size_hint: 0.8, 0.2
+        color: 77/255, 121/255, 168/255, 255/255
+        bg_color: 230/255, 242/255, 254/255, 255/255
+        pos_hint: { 'center_x': 0.5 , 'top': 0.25  }
+        on_release: root.see_description(self)
