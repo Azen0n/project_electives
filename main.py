@@ -1,8 +1,9 @@
+from kivy import Config
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.factory import Factory
 from kivy.lang import Builder
+from kivy.factory import Factory
+from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
@@ -11,6 +12,12 @@ import algorithm
 import database_access
 from components import IconButton, MenuButton
 from extended_screen_manager import ExtendedScreenManager
+
+Config.set('graphics', 'width', '1280')
+Config.set('graphics', 'height', '720')
+Config.set('graphics', 'resizable', False)
+Config.write()
+Window.clearcolor = 242 / 255, 242 / 255, 242 / 255, 255 / 255
 
 Builder.load_file('screens/start_menu.kv')
 Builder.load_file('screens/main_app.kv')
@@ -27,11 +34,6 @@ Builder.load_file('screens/authentication.kv')
 Builder.load_file('screens/student_menu.kv')
 Builder.load_file('screens/list_of_selected_day.kv')
 Builder.load_file('screens/priorities.kv')
-
-Window.size = 1280, 720
-Window.minimum_width = 800
-Window.minimum_height = 600
-Window.clearcolor = 242 / 255, 242 / 255, 242 / 255, 255 / 255
 
 
 class ListOfCurrentSemester(BoxLayout):
