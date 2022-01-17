@@ -84,8 +84,12 @@ class ElectiveCard(BoxLayout):
     def change_text_input_to(self, readonly: bool):
         if readonly:
             self.back_list_name = 'list_of_selected_day'
+            self.ids.save_button.opacity = 0
+            self.ids.save_button.disabled = True
         else:
             self.back_list_name = 'list_of_current_semester'
+            self.ids.save_button.opacity = 1
+            self.ids.save_button.disabled = False
 
         self.ids.name.readonly = readonly
         self.ids.code.readonly = readonly
@@ -97,20 +101,21 @@ class ElectiveCard(BoxLayout):
         self.ids.footer.readonly = readonly
 
     @staticmethod
-    def save_elective_info():
-        elective_card = screen_manager.get_screen('elective_card').children[0]
-        elective_info = {
-            'code': elective_card.ids.code,
-            'name': elective_card.ids.name,
-            'hours': elective_card.ids.hours,
-            'capacity': elective_card.ids.max_students,
-            'in_charge': elective_card.ids.in_charge,
-            'author': elective_card.ids.author,
-            'annotation': elective_card.ids.annotation,
-            'footer_date': elective_card.ids.footer
-        }
+    def save_elective_info(button):
+        if not button.disabled:
+            elective_card = screen_manager.get_screen('elective_card').children[0]
+            elective_info = {
+                'code': elective_card.ids.code,
+                'name': elective_card.ids.name,
+                'hours': elective_card.ids.hours,
+                'capacity': elective_card.ids.max_students,
+                'in_charge': elective_card.ids.in_charge,
+                'author': elective_card.ids.author,
+                'annotation': elective_card.ids.annotation,
+                'footer_date': elective_card.ids.footer
+            }
 
-        database_access.set_info_by_elective_code(elective_info)
+            database_access.set_info_by_elective_code(elective_info)
 
     def back_to_list(self):
         back_list = screen_manager.get_screen(self.back_list_name)
