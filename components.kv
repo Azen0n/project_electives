@@ -52,6 +52,7 @@
             radius: self.border_radius
 
 
+
 <IconButton>
     icon: ''
     icon_size: self.size[0] * 0.5, self.size[1] * 0.5
@@ -128,24 +129,37 @@
     pos_hint: { 'left': 0, 'center_y': 0.5 }
 
 
-<PriorityPopup@Popup>
+<DragLabel>
+    drop_func: root.swap()
+    failed_drop_func: root.fail()
+    color: 0, 0, 0, 1
+    canvas.before:
+        Color:
+            rgba: 245/255, 245/255, 245/255, 255/255
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10]
+
+
+<PriorityPopup>
+    background: ''
     auto_dismiss: True
     size_hint: 0.5, 0.5
     title: "Расставьте элективы по приоритетам"
+    title_color: 0, 0, 0, 1
+    title_size: 18
     BoxLayout:
+        padding: 15
+        spacing: 10
         orientation: 'vertical'
-        Label:
-            text: "Первый приоритет"
+        DragLabel:
             id: first_priority
-        Label:
-            text: "Второй приоритет"
+        DragLabel:
             id: second_priority
-        Label:
-            text: "Третий приоритет"
+        DragLabel:
             id: third_priority
-        Label:
-            text: "Четвертый приоритет"
+        DragLabel:
             id: fourth_priority
-        Label:
-            text: "Пятый приоритет"
+        DragLabel:
             id: fifth_priority
