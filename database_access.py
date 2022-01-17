@@ -2,7 +2,7 @@ from random import randint
 
 import psycopg2
 
-connection = psycopg2.connect(host='localhost', user='postgres', password='89058539346Dds', dbname='electives')
+connection = psycopg2.connect(host='localhost', user='postgres', password='12345', dbname='Electives')
 cursor = connection.cursor()
 
 

@@ -4,8 +4,11 @@ from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
+from kivydnd.dragndropwidget import DragNDropWidget
 
 import algorithm
 import database_access
@@ -26,12 +29,11 @@ Builder.load_file('screens/algorithm.kv')
 Builder.load_file('screens/authentication.kv')
 Builder.load_file('screens/student_menu.kv')
 Builder.load_file('screens/list_of_selected_day.kv')
-Builder.load_file('screens/priorities.kv')
 
 Window.size = 1280, 720
 Window.minimum_width = 800
 Window.minimum_height = 600
-Window.clearcolor = 242 / 255, 242 / 255, 242 / 255, 255 / 255
+Window.clearcolor = 235 / 255, 235 / 255, 235 / 255, 255 / 255
 
 
 class ListOfCurrentSemester(BoxLayout):
@@ -208,22 +210,35 @@ class Algorithm(RelativeLayout):
         algorithm.distribution()
 
 
-class StudentMenu(BoxLayout):
+class StudentMenu(RelativeLayout):
     def __init__(self, **kwargs):
         super(StudentMenu, self).__init__(**kwargs)
         self.day_of_button = 'just some text to be var element'
+        Clock.schedule_once(self._init_recycle_view)
 
+    def _init_recycle_view(self, dt):
+        self.list_of_priorities = [
+            '',
+            '',
+            '',
+            '',
+            ''
+        ]
+
+
+class TopBoxLayout(BoxLayout):
     @staticmethod
     def open_list_screen(button):
-        labels_list = screen_manager.get_screen('priorities').children[0].list_of_labels
+        labels_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
         list_of_selected_day_screen = screen_manager.get_screen('list_of_selected_day')
         for i in range(len(labels_list)):
-            if labels_list[i].text == "":
+            if labels_list[i] == "":
                 screen_manager.display_screen(list_of_selected_day_screen,
                                               transition=SlideTransition(),
                                               direction='left')
                 StudentMenu.day_of_button = button
-                ListOfSelectedDay.fill_list_of_selected_day(list_of_selected_day_screen.children[0], button.parent.children[1].text)
+                ListOfSelectedDay.fill_list_of_selected_day(list_of_selected_day_screen.children[0],
+                                                            button.parent.children[1].text)
                 break
 
 
@@ -261,12 +276,13 @@ class ListOfSelectedDay(BoxLayout):
 
     @staticmethod
     def line_button_callback(button):
-        elective_code = button.code
-        labels_list = screen_manager.get_screen('priorities').children[0].list_of_labels
+        elective_code = button.parent.ids.name.text
+        labels_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
         for i in range(len(labels_list)):
-            if (labels_list[i].text == '') & (len(StudentMenu.day_of_button.parent.parent.children[0].children) < 3):
-                labels_list[i].text = elective_code
+            if (labels_list[i] == '') & (len(StudentMenu.day_of_button.parent.parent.children[0].children) < 3):
+                labels_list[i] = elective_code
                 elective = ElectivePin()
+                elective.code = button.code
                 StudentMenu.day_of_button.parent.parent.children[0].add_widget(elective)
                 elective.elective_text.text = elective_code
                 # ListOfSelectedDay.block_button()
@@ -281,68 +297,57 @@ class ListOfSelectedDay(BoxLayout):
         Window.set_system_cursor('arrow')
 
 
-class ElectivePin(BoxLayout):
+class ElectivePin(RelativeLayout):
     def __init__(self, **kwargs):
         super(ElectivePin, self).__init__(**kwargs)
         self.elective_text = self.ids.elective_name
 
-    def clear_elective(self):
-        self.remove_widget(self)
+    def clear_elective(self, button):
+        priorities_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
+        elective_name = button.parent.children[1].text
+        for i in range(len(priorities_list)):
+            if priorities_list[i] == elective_name:
+                priorities_list[i] = ''
+        self.parent.remove_widget(self)
+
+    def see_description(self, button):
+        ListOfSelectedDay.line_open_button_callback(self)
 
 
-class Priorities(BoxLayout):
+class StartMenuScreenManager(ExtendedScreenManager):
+    pass
+
+
+class DragLabel(Label, DragNDropWidget):
+    def __init__(self, **kw):
+        super(DragLabel, self).__init__(**kw)
+
+    def swap(self):
+        pass
+
+    def fail(self):
+        pass
+
+
+class PriorityPopup(Popup):
     def __init__(self, **kwargs):
-        super(Priorities, self).__init__(**kwargs)
+        super(PriorityPopup, self).__init__(**kwargs)
         Clock.schedule_once(self._init_recycle_view)
 
     def _init_recycle_view(self, dt):
-        self.list_of_labels = [
+        list_of_priorities = screen_manager.get_screen('student_menu').children[0].list_of_priorities
+        self.list_of_priorities_pop = [
             self.ids.first_priority,
             self.ids.second_priority,
             self.ids.third_priority,
             self.ids.fourth_priority,
             self.ids.fifth_priority
         ]
-        self.list_of_boxLayouts = [
-            self.ids.firstLine,
-            self.ids.secondLine,
-            self.ids.thirdLine,
-            self.ids.fourthLine,
-            self.ids.fifthLine
-        ]
+        for i in range(len(self.list_of_priorities_pop)):
+            self.list_of_priorities_pop[i].text = list_of_priorities[i]
 
-    @staticmethod
-    def button_down(button):
-        list_of_priorities_screen = screen_manager.get_screen('priorities').children[0]
-        for i in range(len(list_of_priorities_screen.list_of_boxLayouts)):
-            if button.parent == list_of_priorities_screen.list_of_boxLayouts[i]:
-                list_of_priorities_screen.list_of_labels[i].text, \
-                list_of_priorities_screen.list_of_labels[i + 1].text = \
-                    list_of_priorities_screen.list_of_labels[i + 1].text, \
-                    list_of_priorities_screen.list_of_labels[i].text
-
-    # TODO:сделать красиво через второй аргумент +-
-
-    @staticmethod
-    def button_up(button):
-        list_of_priorities_screen = screen_manager.get_screen('priorities').children[0]
-        for i in range(len(list_of_priorities_screen.list_of_boxLayouts)):
-            if button.parent == list_of_priorities_screen.list_of_boxLayouts[i]:
-                list_of_priorities_screen.list_of_labels[i].text, \
-                list_of_priorities_screen.list_of_labels[i - 1].text = \
-                    list_of_priorities_screen.list_of_labels[i - 1].text, \
-                    list_of_priorities_screen.list_of_labels[i].text
-
-    @staticmethod
-    def delete_button(button):
-        list_of_priorities_screen = screen_manager.get_screen('priorities').children[0]
-        for i in range(len(list_of_priorities_screen.list_of_boxLayouts)):
-            if button.parent == list_of_priorities_screen.list_of_boxLayouts[i]:
-                list_of_priorities_screen.list_of_labels[i].text = ''
-
-
-class StartMenuScreenManager(ExtendedScreenManager):
-    pass
+    def open_popup(self):
+        self.open()
 
 
 class StartMenu(RelativeLayout):
@@ -356,7 +361,7 @@ class StartMenu(RelativeLayout):
         StartMenu.add_menu_line(main_app,
                                 'images/braindead_logo.png',
                                 'Приоритеты',
-                                Factory.PriorityPopup().open)
+                                MainApp.open_priority_popup)
         main_app.ids.icon_box.add_widget(BoxLayout())
         main_app.ids.text_box.add_widget(BoxLayout())
         main_app.ids.screen_manager.display_screen('student_menu',
@@ -419,6 +424,9 @@ class MainApp(BoxLayout):
     def priorities_button_click(self):
         screen_manager.display_screen('priorities',
                                       transition=RiseInTransition(clearcolor=Window.clearcolor))
+
+    def open_priority_popup(self):
+        PriorityPopup.open_popup(PriorityPopup())
 
 
 screen_manager: ExtendedScreenManager
