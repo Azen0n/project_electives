@@ -8,6 +8,7 @@ def get_current_electives_info():
     cursor.execute('''
         SELECT code, electiveName, hours, capacity
         FROM electives
+        ORDER BY electiveName
     ''')
     elective_tuple_list = cursor.fetchall()
 
@@ -68,10 +69,11 @@ def get_electives_info_by_semester(semester):
     year, season = semester[:4], semester[-1:-6]
 
     cursor.execute(f'''
-        SELECT DISTINCT electives.code, electives.electiveName
+        SELECT DISTINCT electives.code, electives.electiveName, electives.hours, electives.capacity
         FROM selected_electives
             JOIN electives ON selected_electives.electiveID = electives.eLectiveID
         WHERE yearofpassage = '{year}' AND semester = '{season}'
+        ORDER BY electives.electiveName
     ''')
     elective_tuple_list = cursor.fetchall()
 
@@ -152,6 +154,7 @@ def get_current_elective_codes_and_names(day):
         FROM electives
             JOIN elective_groups_datatable ON electives.electiveID = elective_groups_datatable.electiveID
         WHERE elective_groups_datatable.day = '{day}'
+        ORDER BY electives.electiveName
     ''')
     elective_tuple_list = cursor.fetchall()
 
