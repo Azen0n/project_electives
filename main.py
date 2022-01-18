@@ -9,7 +9,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
 from kivy_garden.draggable import KXDraggableBehavior
-from kivydnd.dragndropwidget import DragNDropWidget
 
 import algorithm
 import database_access
@@ -220,16 +219,11 @@ class StudentMenu(RelativeLayout):
     def __init__(self, **kwargs):
         super(StudentMenu, self).__init__(**kwargs)
         self.day_of_button = 'just some text to be var element'
+        self.student_id = 'student id'
         Clock.schedule_once(self._init_recycle_view)
 
     def _init_recycle_view(self, dt):
-        self.list_of_priorities = [
-            '',
-            '',
-            '',
-            '',
-            ''
-        ]
+        self.list_of_priorities = [['']*2 for i in range(5)]
 
 
 class TopBoxLayout(BoxLayout):
@@ -238,7 +232,7 @@ class TopBoxLayout(BoxLayout):
         labels_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
         list_of_selected_day_screen = screen_manager.get_screen('list_of_selected_day')
         for i in range(len(labels_list)):
-            if labels_list[i] == "":
+            if labels_list[i][0] == "":
                 screen_manager.display_screen(list_of_selected_day_screen,
                                               transition=SlideTransition(),
                                               direction='left')
@@ -282,15 +276,16 @@ class ListOfSelectedDay(BoxLayout):
 
     @staticmethod
     def line_button_callback(button):
-        elective_code = button.parent.ids.name.text
+        elective_name = button.parent.ids.name.text
         labels_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
         for i in range(len(labels_list)):
-            if (labels_list[i] == '') & (len(StudentMenu.day_of_button.parent.parent.children[0].children) < 3):
-                labels_list[i] = elective_code
+            if (labels_list[i][0] == '') & (len(StudentMenu.day_of_button.parent.parent.children[0].children) < 3):
+                labels_list[i][0] = elective_name
+                labels_list[i][1] = button.code
                 elective = ElectivePin()
                 elective.code = button.code
                 StudentMenu.day_of_button.parent.parent.children[0].add_widget(elective)
-                elective.elective_text.text = elective_code
+                elective.elective_text.text = elective_name
                 # ListOfSelectedDay.block_button()
                 break
         ListOfSelectedDay.back_to_list()
@@ -312,8 +307,9 @@ class ElectivePin(RelativeLayout):
         priorities_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
         elective_name = button.parent.ids.elective_name.text
         for i in range(len(priorities_list)):
-            if priorities_list[i] == elective_name:
-                priorities_list[i] = ''
+            if priorities_list[i][0] == elective_name:
+                priorities_list[i][0] = ''
+                priorities_list[i][1] = ''
         self.parent.remove_widget(self)
 
     @staticmethod
@@ -341,16 +337,18 @@ class PriorityPopup(Popup):
             self.ids.fifth_priority
         ]
         for i in range(len(self.list_of_priorities_pop)):
-            self.list_of_priorities_pop[i].text = list_of_priorities[i]
+            self.list_of_priorities_pop[i].text = list_of_priorities[i][0]
 
     def open_popup(self):
         self.open()
 
     @staticmethod
-    def confirm(Popup):
-        list_of_priorities = [x.text for x in Popup.list_of_priorities_pop]
+    def confirm():
+        student_menu_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
+        list_of_priorities = [row[1] for row in student_menu_list]
         database_access.student_priorities(1234, list_of_priorities)
         BrainDeadApp.get_running_app().stop()
+
 
 class StartMenuScreenManager(ExtendedScreenManager):
     pass
