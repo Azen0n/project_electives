@@ -2,8 +2,6 @@
     name: 'student_menu'
     StudentMenu
 
-<StudentMenuButton@Button>
-    text: '+'
 
 <StudentMenuLabel@Label>
     text_size: self.size
@@ -118,4 +116,4 @@
         color: 77/255, 121/255, 168/255, 255/255
         bg_color: 230/255, 242/255, 254/255, 255/255
         pos_hint: { 'center_x': 0.5 , 'top': 0.25  }
-        on_release: root.see_description(self)
+        on_release: root.see_description()

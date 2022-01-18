@@ -309,11 +309,12 @@ class ElectivePin(RelativeLayout):
 
     def clear_elective(self, button):
         priorities_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
-        elective_name = button.parent.children[1].text
+        elective_name = button.parent.ids.elective_name.text
         for i in range(len(priorities_list)):
             if priorities_list[i] == elective_name:
                 priorities_list[i] = ''
         self.parent.remove_widget(self)
+
 
     def see_description(self, button):
         ListOfSelectedDay.line_open_button_callback(button, True)
