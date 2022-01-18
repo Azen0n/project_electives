@@ -175,8 +175,7 @@ class ListOfSelectedSemester(BoxLayout):
                                       direction='left')
         Window.set_system_cursor('arrow')
 
-        # TODO: Добавить получение семестра
-        semester = '2001 год, осень'
+        semester = screen_manager.get_screen('list_of_selected_semester').children[0].ids.title.text
         elective_code = button.code
         elective_statistics = database_access.get_statistics_by_elective_code(semester, elective_code)
         statistics_screen.children[0].fill_statistics(elective_statistics)
