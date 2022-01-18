@@ -34,6 +34,8 @@
     BoxLayout:
         padding: 15, 7.5
         spacing: 15
+        size_hint_y: None
+        height: self.minimum_height
 
         StatBoxLayout:
             IconButton:
@@ -100,6 +102,8 @@
     BoxLayout:
         padding: 15, 7.5
         spacing: 15
+        size_hint_y: None
+        height: self.minimum_height
 
         StatBoxLayout:
             RelativeLayout:
@@ -113,6 +117,11 @@
                     text: 'Средний приоритет'
                 StatVarLabel:
                     id: average_priority
+
+    BoxLayout
+        padding: 15, 7.5
+        StatBoxLayout:
+            size_hint_y: 1
 
 
 <StatBoxLayout@BoxLayout>

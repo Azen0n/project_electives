@@ -1,11 +1,11 @@
+from kivy import Config
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.factory import Factory
 from kivy.lang import Builder
-from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
 from kivydnd.dragndropwidget import DragNDropWidget
@@ -14,6 +14,12 @@ import algorithm
 import database_access
 from components import IconButton, MenuButton
 from extended_screen_manager import ExtendedScreenManager
+
+Config.set('graphics', 'width', '1280')
+Config.set('graphics', 'height', '720')
+Config.set('graphics', 'resizable', False)
+Config.write()
+Window.clearcolor = 242 / 255, 242 / 255, 242 / 255, 255 / 255
 
 Builder.load_file('screens/start_menu.kv')
 Builder.load_file('screens/main_app.kv')
@@ -29,11 +35,6 @@ Builder.load_file('screens/algorithm.kv')
 Builder.load_file('screens/authentication.kv')
 Builder.load_file('screens/student_menu.kv')
 Builder.load_file('screens/list_of_selected_day.kv')
-
-Window.size = 1280, 720
-Window.minimum_width = 800
-Window.minimum_height = 600
-Window.clearcolor = 235 / 255, 235 / 255, 235 / 255, 255 / 255
 
 
 class ListOfCurrentSemester(BoxLayout):
@@ -83,8 +84,12 @@ class ElectiveCard(BoxLayout):
     def change_text_input_to(self, readonly: bool):
         if readonly:
             self.back_list_name = 'list_of_selected_day'
+            self.ids.save_button.opacity = 0
+            self.ids.save_button.disabled = True
         else:
             self.back_list_name = 'list_of_current_semester'
+            self.ids.save_button.opacity = 1
+            self.ids.save_button.disabled = False
 
         self.ids.name.readonly = readonly
         self.ids.code.readonly = readonly
@@ -96,20 +101,21 @@ class ElectiveCard(BoxLayout):
         self.ids.footer.readonly = readonly
 
     @staticmethod
-    def save_elective_info():
-        elective_card = screen_manager.get_screen('elective_card').children[0]
-        elective_info = {
-            'code': elective_card.ids.code,
-            'name': elective_card.ids.name,
-            'hours': elective_card.ids.hours,
-            'capacity': elective_card.ids.max_students,
-            'in_charge': elective_card.ids.in_charge,
-            'author': elective_card.ids.author,
-            'annotation': elective_card.ids.annotation,
-            'footer_date': elective_card.ids.footer
-        }
+    def save_elective_info(button):
+        if not button.disabled:
+            elective_card = screen_manager.get_screen('elective_card').children[0]
+            elective_info = {
+                'code': elective_card.ids.code.text,
+                'name': elective_card.ids.name.text,
+                'hours': elective_card.ids.hours.text,
+                'capacity': elective_card.ids.max_students.text,
+                'in_charge': elective_card.ids.in_charge.text,
+                'author': elective_card.ids.author.text,
+                'annotation': elective_card.ids.annotation.text,
+                'footer_date': elective_card.ids.footer.text
+            }
 
-        database_access.set_info_by_elective_code(elective_info)
+            database_access.set_info_by_elective_code(elective_info)
 
     def back_to_list(self):
         back_list = screen_manager.get_screen(self.back_list_name)
@@ -169,8 +175,7 @@ class ListOfSelectedSemester(BoxLayout):
                                       direction='left')
         Window.set_system_cursor('arrow')
 
-        # TODO: Добавить получение семестра
-        semester = '2001 год, осень'
+        semester = screen_manager.get_screen('list_of_selected_semester').children[0].ids.title.text
         elective_code = button.code
         elective_statistics = database_access.get_statistics_by_elective_code(semester, elective_code)
         statistics_screen.children[0].fill_statistics(elective_statistics)
@@ -310,12 +315,9 @@ class ElectivePin(RelativeLayout):
                 priorities_list[i] = ''
         self.parent.remove_widget(self)
 
-    def see_description(self):
-        ListOfSelectedDay.line_open_button_callback(self)
 
-
-class StartMenuScreenManager(ExtendedScreenManager):
-    pass
+    def see_description(self, button):
+        ListOfSelectedDay.line_open_button_callback(button, True)
 
 
 class DragLabel(Label, DragNDropWidget):
@@ -348,6 +350,10 @@ class PriorityPopup(Popup):
 
     def open_popup(self):
         self.open()
+
+
+class StartMenuScreenManager(ExtendedScreenManager):
+    pass
 
 
 class StartMenu(RelativeLayout):

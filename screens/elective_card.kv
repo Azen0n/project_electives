@@ -31,10 +31,11 @@
                 font_size: 25
 
         IconButton:
+            id: save_button
             icon: 'images/save.png'
             size: 60, 60
             bg_color: 30/255, 40/255, 78/255, 255/255
-            on_release: root.save_elective_info()
+            on_release: root.save_elective_info(self)
 
     BoxLayout:
         orientation: 'vertical'
@@ -99,6 +100,7 @@
                 ElectiveCardTextInput:
                     id: annotation
                     multiline: True
+                    max_length: 0
                     halign: 'left'
                     pos_hint: { 'top': 1 }
 

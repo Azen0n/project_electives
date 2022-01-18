@@ -1,16 +1,23 @@
-from random import randint
-
 import psycopg2
 
-connection = psycopg2.connect(host='localhost', user='postgres', password='12345', dbname='Electives')
+connection = psycopg2.connect(host='localhost', user='postgres', password='12345', dbname='electives')
 cursor = connection.cursor()
 
 
+def generate_elective_for_student(studentid, electiveid, priority, yearofpassage, semester):
+    cursor.execute(f'''
+                INSERT INTO selected_electives(studentid, electiveid, priority, yearofpassage, semester)
+                VALUES ({studentid}, {electiveid}, {priority}, {yearofpassage}, '{semester}')
+            ''')
+    connection.commit()
+
+
 def get_current_electives_info():
-    cursor.execute("""
+    cursor.execute('''
         SELECT code, electiveName, hours, capacity
         FROM electives
-        """)
+        ORDER BY electiveName
+    ''')
     elective_tuple_list = cursor.fetchall()
 
     elective_info_lists = list(zip(*elective_tuple_list))
@@ -18,11 +25,11 @@ def get_current_electives_info():
 
 
 def get_info_by_elective_code(code):
-    cursor.execute(f"""
+    cursor.execute(f'''
         SELECT code, electivename, capacity, hours, incharge, author, annotation, dateofchange
         FROM electives
         WHERE code = '{code}'
-        """)
+    ''')
     info_tuple = cursor.fetchall()
 
     string_info_tuple = list(map(str, info_tuple[0]))
@@ -40,26 +47,26 @@ def get_info_by_elective_code(code):
 
 
 def set_info_by_elective_code(info):
-    cursor.execute(f"""
+    cursor.execute(f'''
         UPDATE electives
         SET electivename='{info['name']}',
-            capacity='{info['capacity']}',
-            hours='{info['hours']}',
+            capacity={info['capacity']},
+            hours={info['hours']},
             incharge='{info['in_charge']}',
             author='{info['author']}',
             annotation='{info['annotation']}',
-            dateofchange='{info['footer_data']}'
+            dateofchange='{info['footer_date']}'
         WHERE code='{info['code']}';
-        """)
+    ''')
     connection.commit()
 
 
 def get_semesters():
-    cursor.execute(f"""
+    cursor.execute(f'''
         SELECT yearofpassage, semester
         FROM selected_electives
         GROUP BY yearofpassage, semester
-        """)
+    ''')
     semester_tuple_list = cursor.fetchall()
 
     list_of_semesters = [str(item[0]) + ' год, ' + item[1] for item in semester_tuple_list]
@@ -67,14 +74,15 @@ def get_semesters():
 
 
 def get_electives_info_by_semester(semester):
-    year, season = semester[:4], semester[-1:-6]
+    year, season = int(semester[:4]), semester[10:]
 
-    cursor.execute(f"""
-        SELECT DISTINCT electives.code, electives.electiveName
+    cursor.execute(f'''
+        SELECT DISTINCT electives.code, electives.electiveName, electives.hours, electives.capacity
         FROM selected_electives
             JOIN electives ON selected_electives.electiveID = electives.eLectiveID
         WHERE yearofpassage = '{year}' AND semester = '{season}'
-        """)
+        ORDER BY electives.electiveName
+    ''')
     elective_tuple_list = cursor.fetchall()
 
     elective_info_lists = list(zip(*elective_tuple_list))
@@ -82,57 +90,66 @@ def get_electives_info_by_semester(semester):
 
 
 def get_statistics_by_elective_code(semester, code):
-    year, season = semester[:4], semester[-1:-6]
+    year, season = int(semester[:4]), semester[10:]
 
     # Возвращает имя электива по его коду
-    cursor.execute(f"""
+    cursor.execute(f'''
         SELECT electiveName
         FROM electives
-        WHERE code = {code}
-        """)
-    elective_name = cursor.fetchall()
+        WHERE code = '{code}'
+    ''')
+    elective_name = cursor.fetchall()[0][0]
 
     # Возвращает среднюю оценку для электива в определенном семестре
-    cursor.execute(f"""
-        SELECT CAST(AVG(Students.perfomance) AS NUMERIC(3, 2))
+    cursor.execute(f'''
+        SELECT AVG(Students.performance)
         FROM selected_electives 
-            JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
+            JOIN electives ON selected_electives.electiveID = electives.eLectiveID
             JOIN Students ON selected_electives.studentID = Students.studentID
-        WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
-        """)
-    average_grade = cursor.fetchall()
+        WHERE yearofpassage = {year} AND semester = '{season}' AND code = '{code}'
+    ''')
+    average_grade = round(cursor.fetchall()[0][0], 2)
 
     # Возвращает средний приоритет для электива в определенном семестре
-    cursor.execute(f"""
-        SELECT CAST(AVG(priority) AS NUMERIC(3, 2))
+    cursor.execute(f'''
+        SELECT AVG(priority)
         FROM selected_electives
-            JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
-        WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
-        """)
-    average_priority = cursor.fetchall()
+            JOIN electives ON selected_electives.electiveID = electives.eLectiveID
+        WHERE yearofpassage = {year} AND semester = '{season}' AND code = '{code}'
+    ''')
+    average_priority = round(cursor.fetchall()[0][0], 2)
 
     # Возвращает список с количеством людей для каждого приоритета для электива в определенном семестре
-    cursor.execute(f"""
+    cursor.execute(f'''
         SELECT selected_electives.priority, COUNT(*) AS number_of_elections 
         FROM selected_electives
-            JOIN Electives ON selected_electives.electiveID = Electives.eLectiveID
-        WHERE yearofpassage = {year} AND semester = {season} AND Electives.code = {code}
+            JOIN electives ON selected_electives.electiveID = electives.eLectiveID
+        WHERE yearofpassage = {year} AND semester = '{season}' AND electives.code = '{code}'
         GROUP BY selected_electives.priority
-        """)
+    ''')
     prioritization_bd = cursor.fetchall()
 
     prioritization = [0] * 5
     for priority in prioritization_bd:
         prioritization[priority[0] - 1] = priority[1]
 
-    #############
+    # Возвращает список с количеством людей для каждого приоритета в определенном интервале оценок
+    cursor.execute(f'''
+        SELECT selected_electives.priority, Count(*) AS number_of_elections
+        FROM selected_electives
+            JOIN electives ON selected_electives.electiveID = electives.eLectiveID
+            JOIN Students ON selected_electives.studentID = Students.studentID
+        WHERE yearofpassage = {year} AND semester = '{season}' AND electives.code = '{code}'
+            AND Students.performance > 0 AND Students.performance <= 3.5
+        GROUP BY selected_electives.priority
+    ''')
     prioritization_by_grades_1d = [0, 0, 2, 2, 0, 1, 0, 2, 1, 1, 1, 5, 3, 0, 1, 0, 1, 0, 4, 1]  # Генерация данных
     prioritization_by_grades_2d = [[prioritization_by_grades_1d[i:i + 5:] for i in range(0, 4 * 5, 5)]]
 
     statistics = {
-        'name': str(elective_name),
-        'average_grade': float(average_grade),
-        'average_priority': float(average_priority),
+        'name': elective_name,
+        'average_grade': average_grade,
+        'average_priority': average_priority,
         'prioritization': prioritization,
         'prioritization_by_grades': prioritization_by_grades_2d
     }
@@ -140,12 +157,13 @@ def get_statistics_by_elective_code(semester, code):
 
 
 def get_current_elective_codes_and_names(day):
-    cursor.execute(f"""
+    cursor.execute(f'''
         SELECT electives.code, electives.electiveName, electives.hours, electives.capacity
         FROM electives
             JOIN elective_groups_datatable ON electives.electiveID = elective_groups_datatable.electiveID
         WHERE elective_groups_datatable.day = '{day}'
-        """)
+        ORDER BY electives.electiveName
+    ''')
     elective_tuple_list = cursor.fetchall()
 
     elective_info_lists = list(zip(*elective_tuple_list))
@@ -153,11 +171,11 @@ def get_current_elective_codes_and_names(day):
 
 
 def authentication_by_id(auth_id):
-    cursor.execute(f"""
+    cursor.execute(f'''
         SELECT 1
         FROM students
         WHERE studentID = '{auth_id}'
-        """)
+    ''')
     user = cursor.fetchall()
     return user
 

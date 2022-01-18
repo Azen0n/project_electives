@@ -13,7 +13,7 @@ class ElectiveCardTextInput(TextInput):
     max_length = 50
 
     def insert_text(self, substring, from_undo=False):
-        if len(self.text) < self.max_length:
+        if len(self.text) < self.max_length or self.max_length == 0:
             return super().insert_text(substring, from_undo=from_undo)
 
 
