@@ -44,7 +44,6 @@ def generate_students_priorities(number_of_students, number_of_electives, distri
 
 
 def random_shit_part_two(number_of_students, number_of_electives, p):
-    np.random.seed(1)
     students_priorities = [[] for _ in range(number_of_students)]
     for i in range(5):
         for student_i in range(number_of_students):
