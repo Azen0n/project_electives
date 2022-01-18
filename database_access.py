@@ -164,11 +164,11 @@ def get_current_elective_codes_and_names(day):
 
 def authentication_by_id(auth_id):
     cursor.execute(f'''
-        SELECT 1
+        SELECT studentid
         FROM students
         WHERE studentID = '{auth_id}'
     ''')
-    user = cursor.fetchall()
+    user = cursor.fetchall()[0][0]
     return user
 
 

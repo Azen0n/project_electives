@@ -3,6 +3,7 @@
 <StartMenuScreenManager>
     StartMenuScreen
     MainAppScreen
+    AuthenticationScreen
 
 
 <StartMenuScreen@Screen>
@@ -43,7 +44,7 @@
             border_radius: [10]
             bg_color: 32/255, 77/255, 176/255, 255/255
             pos_hint: { 'center_x': 0.5 }
-            on_release: root.start_student(app.root)
+            on_release: root.start_student_authentication(app.root)
 
         HoverButton:
             text: 'Администратор'

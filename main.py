@@ -215,15 +215,42 @@ class Algorithm(RelativeLayout):
         algorithm.distribution()
 
 
+class Authentication(RelativeLayout):
+    @staticmethod
+    def check_student_id(start_screen_manager, text_input):
+        student_id = database_access.authentication_by_id(text_input.text)
+        if str(student_id) == text_input.text:
+            main_app = start_screen_manager.get_screen('main_app').children[0]
+            main_app.ids.screen_manager.get_screen('student_menu').children[0].student_id = student_id
+            Authentication.start_student(start_screen_manager)
+
+    @staticmethod
+    def start_student(start_screen_manager):
+        main_app = start_screen_manager.get_screen('main_app').children[0]
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Выбор элективов',
+                                MainApp.student_menu_button_click)
+        StartMenu.add_menu_line(main_app,
+                                'images/braindead_logo.png',
+                                'Приоритеты',
+                                MainApp.open_priority_popup)
+        main_app.ids.icon_box.add_widget(BoxLayout())
+        main_app.ids.text_box.add_widget(BoxLayout())
+        main_app.ids.screen_manager.display_screen('student_menu',
+                                                   transition=NoTransition())
+        StartMenu.change_to_main_app(start_screen_manager)
+
+
 class StudentMenu(RelativeLayout):
     def __init__(self, **kwargs):
         super(StudentMenu, self).__init__(**kwargs)
         self.day_of_button = 'just some text to be var element'
-        self.student_id = 'student id'
+        self.student_id = 0
         Clock.schedule_once(self._init_recycle_view)
 
     def _init_recycle_view(self, dt):
-        self.list_of_priorities = [['']*2 for i in range(5)]
+        self.list_of_priorities = [[''] * 2 for _ in range(5)]
 
 
 class TopBoxLayout(BoxLayout):
@@ -344,9 +371,9 @@ class PriorityPopup(Popup):
 
     @staticmethod
     def confirm():
-        student_menu_list = screen_manager.get_screen('student_menu').children[0].list_of_priorities
-        list_of_priorities = [row[1] for row in student_menu_list]
-        database_access.student_priorities(1234, list_of_priorities)
+        student_menu = screen_manager.get_screen('student_menu').children[0]
+        list_of_priorities = [row[1] for row in student_menu.list_of_priorities]
+        database_access.student_priorities(student_menu.student_id, list_of_priorities)
         BrainDeadApp.get_running_app().stop()
 
 
@@ -356,21 +383,9 @@ class StartMenuScreenManager(ExtendedScreenManager):
 
 class StartMenu(RelativeLayout):
     @staticmethod
-    def start_student(start_screen_manager):
-        main_app = start_screen_manager.get_screen('main_app').children[0]
-        StartMenu.add_menu_line(main_app,
-                                'images/braindead_logo.png',
-                                'Выбор элективов',
-                                MainApp.student_menu_button_click)
-        StartMenu.add_menu_line(main_app,
-                                'images/braindead_logo.png',
-                                'Приоритеты',
-                                MainApp.open_priority_popup)
-        main_app.ids.icon_box.add_widget(BoxLayout())
-        main_app.ids.text_box.add_widget(BoxLayout())
-        main_app.ids.screen_manager.display_screen('student_menu',
-                                                   transition=NoTransition())
-        StartMenu.change_to_main_app(start_screen_manager)
+    def start_student_authentication(start_screen_manager):
+        start_screen_manager.display_screen('authentication',
+                                            transition=NoTransition())
 
     @staticmethod
     def start_administrator(start_screen_manager):
