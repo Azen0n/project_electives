@@ -4,6 +4,14 @@ connection = psycopg2.connect(host='localhost', user='postgres', password='12345
 cursor = connection.cursor()
 
 
+def generate_elective_for_student(studentid, electiveid, priority, yearofpassage, semester):
+    cursor.execute(f'''
+                INSERT INTO selected_electives(studentid, electiveid, priority, yearofpassage, semester)
+                VALUES ({studentid}, {electiveid}, {priority}, {yearofpassage}, '{semester}')
+            ''')
+    connection.commit()
+
+
 def get_current_electives_info():
     cursor.execute('''
         SELECT code, electiveName, hours, capacity
@@ -66,7 +74,7 @@ def get_semesters():
 
 
 def get_electives_info_by_semester(semester):
-    year, season = semester[:4], semester[-1:-6]
+    year, season = int(semester[:4]), semester[10:]
 
     cursor.execute(f'''
         SELECT DISTINCT electives.code, electives.electiveName, electives.hours, electives.capacity
@@ -82,41 +90,41 @@ def get_electives_info_by_semester(semester):
 
 
 def get_statistics_by_elective_code(semester, code):
-    year, season = semester[:4], semester[-1:-6]
+    year, season = int(semester[:4]), semester[10:]
 
     # Возвращает имя электива по его коду
     cursor.execute(f'''
         SELECT electiveName
         FROM electives
-        WHERE code = {code}
+        WHERE code = '{code}'
     ''')
-    elective_name = cursor.fetchall()
+    elective_name = cursor.fetchall()[0][0]
 
     # Возвращает среднюю оценку для электива в определенном семестре
     cursor.execute(f'''
-        SELECT CAST(AVG(Students.perfomance) AS NUMERIC(3, 2))
+        SELECT AVG(Students.performance)
         FROM selected_electives 
             JOIN electives ON selected_electives.electiveID = electives.eLectiveID
             JOIN Students ON selected_electives.studentID = Students.studentID
-        WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
+        WHERE yearofpassage = {year} AND semester = '{season}' AND code = '{code}'
     ''')
-    average_grade = cursor.fetchall()
+    average_grade = round(cursor.fetchall()[0][0], 2)
 
     # Возвращает средний приоритет для электива в определенном семестре
     cursor.execute(f'''
-        SELECT CAST(AVG(priority) AS NUMERIC(3, 2))
+        SELECT AVG(priority)
         FROM selected_electives
             JOIN electives ON selected_electives.electiveID = electives.eLectiveID
-        WHERE yearofpassage = {year} AND semester = {season} AND code = {code}
+        WHERE yearofpassage = {year} AND semester = '{season}' AND code = '{code}'
     ''')
-    average_priority = cursor.fetchall()
+    average_priority = round(cursor.fetchall()[0][0], 2)
 
     # Возвращает список с количеством людей для каждого приоритета для электива в определенном семестре
     cursor.execute(f'''
         SELECT selected_electives.priority, COUNT(*) AS number_of_elections 
         FROM selected_electives
             JOIN electives ON selected_electives.electiveID = electives.eLectiveID
-        WHERE yearofpassage = {year} AND semester = {season} AND electives.code = {code}
+        WHERE yearofpassage = {year} AND semester = '{season}' AND electives.code = '{code}'
         GROUP BY selected_electives.priority
     ''')
     prioritization_bd = cursor.fetchall()
@@ -131,17 +139,17 @@ def get_statistics_by_elective_code(semester, code):
         FROM selected_electives
             JOIN electives ON selected_electives.electiveID = electives.eLectiveID
             JOIN Students ON selected_electives.studentID = Students.studentID
-        WHERE yearofpassage = {year} AND semester = {season} AND electives.code = [code]
-            AND Students.perfomance > 0 AND Students.perfomance <= 3.5
+        WHERE yearofpassage = {year} AND semester = '{season}' AND electives.code = '{code}'
+            AND Students.performance > 0 AND Students.performance <= 3.5
         GROUP BY selected_electives.priority
     ''')
     prioritization_by_grades_1d = [0, 0, 2, 2, 0, 1, 0, 2, 1, 1, 1, 5, 3, 0, 1, 0, 1, 0, 4, 1]  # Генерация данных
     prioritization_by_grades_2d = [[prioritization_by_grades_1d[i:i + 5:] for i in range(0, 4 * 5, 5)]]
 
     statistics = {
-        'name': str(elective_name),
-        'average_grade': float(average_grade),
-        'average_priority': float(average_priority),
+        'name': elective_name,
+        'average_grade': average_grade,
+        'average_priority': average_priority,
         'prioritization': prioritization,
         'prioritization_by_grades': prioritization_by_grades_2d
     }
