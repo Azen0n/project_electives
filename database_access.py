@@ -4,14 +4,6 @@ connection = psycopg2.connect(host='localhost', user='postgres', password='12345
 cursor = connection.cursor()
 
 
-def generate_elective_for_student(studentid, electiveid, priority, yearofpassage, semester):
-    cursor.execute(f'''
-                INSERT INTO selected_electives(studentid, electiveid, priority, yearofpassage, semester)
-                VALUES ({studentid}, {electiveid}, {priority}, {yearofpassage}, '{semester}')
-            ''')
-    connection.commit()
-
-
 def get_current_electives_info():
     cursor.execute('''
         SELECT code, electiveName, hours, capacity
