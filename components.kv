@@ -130,9 +130,8 @@
 
 
 <DragLabel>
-    drop_func: root.swap()
-    failed_drop_func: root.fail()
     color: 0, 0, 0, 1
+    drag_cls: 'drag'
     canvas.before:
         Color:
             rgba: 245/255, 245/255, 245/255, 255/255
@@ -141,6 +140,8 @@
             pos: self.pos
             radius: [10]
 
+<RdBoxLayout@KXReorderableBehavior+BoxLayout>
+    drag_classes: ['drag']
 
 <PriorityPopup>
     background: ''
@@ -150,16 +151,27 @@
     title_color: 0, 0, 0, 1
     title_size: 18
     BoxLayout:
-        padding: 15
-        spacing: 10
+        padding: 15, 15, 15, 0
         orientation: 'vertical'
-        DragLabel:
-            id: first_priority
-        DragLabel:
-            id: second_priority
-        DragLabel:
-            id: third_priority
-        DragLabel:
-            id: fourth_priority
-        DragLabel:
-            id: fifth_priority
+        spacing: 10
+        RdBoxLayout:
+            size_hint_y: 5/6
+            spacing: 10
+            orientation: 'vertical'
+            DragLabel:
+                id: first_priority
+            DragLabel:
+                id: second_priority
+            DragLabel:
+                id: third_priority
+            DragLabel:
+                id: fourth_priority
+            DragLabel:
+                id: fifth_priority
+        HoverButton:
+            text: "Подтвердить"
+            on_release: root.confirm(root)
+            size_hint: 0.5, 1/6
+            pos_hint: { 'center_x': 0.5 }
+            color: 77/255, 121/255, 168/255, 255/255
+            bg_color: 230/255, 242/255, 254/255, 255/255

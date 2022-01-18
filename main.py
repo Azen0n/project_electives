@@ -8,6 +8,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
+from kivy_garden.draggable import KXDraggableBehavior
 from kivydnd.dragndropwidget import DragNDropWidget
 
 import algorithm
@@ -315,20 +316,14 @@ class ElectivePin(RelativeLayout):
                 priorities_list[i] = ''
         self.parent.remove_widget(self)
 
-
-    def see_description(self, button):
+    @staticmethod
+    def see_description(button):
         ListOfSelectedDay.line_open_button_callback(button, True)
 
 
-class DragLabel(Label, DragNDropWidget):
+class DragLabel(KXDraggableBehavior, Label):
     def __init__(self, **kw):
         super(DragLabel, self).__init__(**kw)
-
-    def swap(self):
-        pass
-
-    def fail(self):
-        pass
 
 
 class PriorityPopup(Popup):
@@ -351,6 +346,11 @@ class PriorityPopup(Popup):
     def open_popup(self):
         self.open()
 
+    @staticmethod
+    def confirm(Popup):
+        list_of_priorities = [x.text for x in Popup.list_of_priorities_pop]
+        database_access.student_priorities(1234, list_of_priorities)
+        BrainDeadApp.get_running_app().stop()
 
 class StartMenuScreenManager(ExtendedScreenManager):
     pass
