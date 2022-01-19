@@ -173,5 +173,14 @@ def authentication_by_id(auth_id):
 
 
 def student_priorities(student_id, elective_code_list):
-    # TODO: Послать в БД данные: id студента и упорядоченный массив кодов его выбранных элективов
-    pass
+    for i, code in enumerate(elective_code_list):
+        cursor.execute(f'''
+            SELECT electiveid
+            FROM electives
+            WHERE code = '{code}'
+        ''')
+        elective_id = cursor.fetchall()[0][0]
+        cursor.execute(f'''
+            INSERT INTO selected_electives(studentid, electiveid, priority, yearofpassage, semester)
+            VALUES ({student_id}, {elective_id}, {i + 1}, {2022}, '{'весна'}')
+        ''')
