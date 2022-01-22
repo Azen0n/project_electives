@@ -9,8 +9,8 @@ class Student:
     elective_id: int = None
 
     def get_elective_priority(self, elective_id: int) -> int:
-        """Возвращает позицию электива в списке приоритетов. Если электив не выбран, возвращает ValueError."""
-        return self.priorities.index(elective_id) + 1
+        """Возвращает позицию электива в списке приоритетов. Если электив не выбран, возвращает 6."""
+        return self.priorities.index(elective_id) + 1 if elective_id in self.priorities else 6
 
     def is_available(self) -> bool:
         return self.elective_id is None
