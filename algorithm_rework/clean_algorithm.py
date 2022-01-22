@@ -32,22 +32,21 @@ class StudentAllocator:
 
 
 def equate_reserve_with_min_capacity(electives: list[Elective]):
-    """Заполняет элективы студентами, чтобы сравнять резерв с минимальной вместимостью."""
+    """Заполняет элективы, которым не хватает несколько студентов до минимальной заполненности, студентами,
+    выбравшими его на второй и далее приоритеты, пока резерв не сравняется с минимальной вместимостью."""
     for elective in electives:
         if elective.is_potentially_completable():
-            allocate_secondary_students_to_equate_reserve(elective, electives)
-
-
-def allocate_secondary_students_to_equate_reserve(elective: Elective, electives: list[Elective]):
-    """Заполняет электив студентами, выбравшими его на второй и далее приоритеты,
-    пока резерв не сравняется с минимальной вместимостью."""
-    elective.sort_students_by_priority(smart_students_first=False)
-    students = get_students_with_secondary_priorities(elective)
-    for student in students:
-        if elective.is_completable():
-            break
-        allocate_secondary_student(student, elective, electives)
-    elective.sort_students_by_priority(smart_students_first=True)
+            elective.sort_students_by_priority(smart_students_first=False)
+            students = get_students_with_secondary_priorities(elective)
+            for student in students:
+                if elective.is_completable():
+                    break
+                first_priority_elective = find_elective(electives, student.priorities[0])
+                if student.is_available() and is_first_priority_elective_available(first_priority_elective, elective):
+                    elective.reserve += 1
+                    first_priority_elective.reserve -= 1
+                    elective.add_student(student)
+            elective.sort_students_by_priority()
 
 
 def get_students_with_secondary_priorities(elective: Elective) -> list[Student]:
@@ -57,15 +56,6 @@ def get_students_with_secondary_priorities(elective: Elective) -> list[Student]:
         if student.priorities[0] != elective.id:
             secondary_students.append(student)
     return secondary_students
-
-
-def allocate_secondary_student(student, elective, electives):
-    """Записывает студента на электив, если электив на первом приоритете этого студента не пострадает."""
-    first_priority_elective = find_elective(electives, student.priorities[0])
-    if student.is_available() and is_first_priority_elective_available(first_priority_elective, elective):
-        elective.reserve += 1
-        first_priority_elective.reserve -= 1
-        elective.add_student(student)
 
 
 def find_elective(electives: list[Elective], elective_id: int) -> Elective:
@@ -102,7 +92,7 @@ def main():
 
     allocator = StudentAllocator(electives, students)
     allocator.greedy_allocation()
-    call_all_metrics_clean(np.array(allocator.students))
+    call_all_metrics_clean(allocator.students)
 
 
 if __name__ == '__main__':
