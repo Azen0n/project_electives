@@ -18,7 +18,8 @@ class StudentAllocator:
 
     def run(self):
         """Запуск алгоритма распределения студентов по элективам."""
-        raise NotImplementedError
+        self.greedy_allocation()
+        self.floyd_allocation()
 
     def sort_electives_by_reserve(self):
         """Сортирует список элективов в порядке убывания резерва."""
@@ -29,6 +30,51 @@ class StudentAllocator:
         equate_reserve_with_min_capacity(self.electives)
         min_capacity_allocation(self.electives)
         max_capacity_allocation(self.electives)
+
+    def floyd_allocation(self):
+        """Запуск алгоритма Флойда."""
+        student_transfer_cost_graph, student_transfer_id_graph = get_student_transfer_graph(self.electives)
+        transfer_path_graph = get_transfer_path_graph(student_transfer_cost_graph)
+        is_in_negative_cycle = True
+        while is_in_negative_cycle:
+            break
+
+
+def get_student_transfer_graph(electives) -> (list[list[float]], list[list[int]]):
+    """Возвращает граф стоимости трансфера студентов с одного электива на другой и граф id этих студентов."""
+    number_of_electives = len(electives)
+    student_transfer_cost_graph = [[50. for _ in range(number_of_electives)] for _ in range(number_of_electives)]
+    student_transfer_id_graph = [[0 for _ in range(number_of_electives)] for _ in range(number_of_electives)]
+
+    for elective in electives:
+        for student in elective.result_students:
+            for priority in student.priorities:
+                if elective.id != priority:
+                    transfer_cost = count_transfer_cost(student, elective.id, priority)
+                    if transfer_cost < student_transfer_cost_graph[elective.id - 1][priority - 1]:
+                        student_transfer_cost_graph[elective.id - 1][priority - 1] = round(-transfer_cost, 2)
+                        student_transfer_id_graph[elective.id - 1][priority - 1] = student.id
+                else:
+                    student_transfer_cost_graph[priority - 1][priority - 1] = 0.
+    return student_transfer_cost_graph, student_transfer_id_graph
+
+
+def count_transfer_cost(student: Student, first_elective_id: int, second_elective_id: int) -> float:
+    """Возвращает стоимость трансфера студента с одного электива на другой."""
+    first_elective_position = student.get_elective_priority(first_elective_id)
+    second_elective_position = student.get_elective_priority(second_elective_id)
+    return student.performance * (first_elective_position - second_elective_position)
+
+
+def get_transfer_path_graph(student_transfer_cost_graph: list[list[float]]):
+    """??????????"""
+    number_of_electives = len(student_transfer_cost_graph)
+    transfer_path_graph = []
+    for i in range(number_of_electives):
+        transfer_path_graph.append([])
+        for j in range(number_of_electives):
+            transfer_path_graph[i].append([(i, j)])
+    return transfer_path_graph
 
 
 def equate_reserve_with_min_capacity(electives: list[Elective]):
@@ -91,7 +137,7 @@ def main():
     students = get_students().tolist()
 
     allocator = StudentAllocator(electives, students)
-    allocator.greedy_allocation()
+    allocator.run()
     call_all_metrics_clean(allocator.students)
 
 
