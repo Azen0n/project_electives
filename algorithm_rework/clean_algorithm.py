@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from math import inf
 
 from algorithm.db_queries.clean_test import get_electives, get_students
 from objects import Elective, Student
@@ -33,30 +34,81 @@ class StudentAllocator:
 
     def floyd_allocation(self):
         """Запуск алгоритма Флойда."""
-        student_transfer_cost_graph, student_transfer_id_graph = get_student_transfer_graph(self.electives)
-        transfer_path_graph = get_transfer_path_graph(student_transfer_cost_graph)
+        number_of_electives = len(self.electives)
+        transfer_cost_graph, transfer_id_graph = self.__get_student_transfer_graph()
+        transfer_path_graph = self.__get_transfer_path_graph()
         is_in_negative_cycle = True
+
         while is_in_negative_cycle:
-            break
+            is_in_negative_cycle = False
+            for k in range(number_of_electives):
+                for p in range(number_of_electives):
+                    if is_possible_to_transfer_student(transfer_path_graph[p][p], transfer_cost_graph[p][p]):
+                        self.__transfer_student(transfer_path_graph[p][p], transfer_id_graph)
+                        transfer_cost_graph, transfer_id_graph = self.__get_student_transfer_graph()
+                        transfer_path_graph = self.__get_transfer_path_graph()
+                        k = 0
+                        is_in_negative_cycle = True
+                adjust_transfer_graph(transfer_cost_graph, transfer_path_graph, k)
+
+    def __get_student_transfer_graph(self) -> (list[list[float]], list[list[int]]):
+        """Возвращает граф стоимости трансфера студентов с одного электива на другой и граф id этих студентов."""
+        number_of_electives = len(self.electives)
+        transfer_cost_graph = [[inf for _ in range(number_of_electives)] for _ in range(number_of_electives)]
+        transfer_id_graph = [[0 for _ in range(number_of_electives)] for _ in range(number_of_electives)]
+
+        for elective in self.electives:
+            for student in elective.result_students:
+                for priority in student.priorities:
+                    if elective.id != priority:
+                        transfer_cost = count_transfer_cost(student, elective.id, priority)
+                        if transfer_cost < transfer_cost_graph[elective.id - 1][priority - 1]:
+                            transfer_cost_graph[elective.id - 1][priority - 1] = round(-transfer_cost, 2)
+                            transfer_id_graph[elective.id - 1][priority - 1] = student.id
+                    else:
+                        transfer_cost_graph[priority - 1][priority - 1] = 0.
+        return transfer_cost_graph, transfer_id_graph
+
+    def __get_transfer_path_graph(self) -> list[list[list[tuple[int]]]]:
+        """Возвращает начальный граф путей трансфера студентов."""
+        number_of_electives = len(self.electives)
+        transfer_path_graph = []
+        for i in range(number_of_electives):
+            transfer_path_graph.append([])
+            for j in range(number_of_electives):
+                transfer_path_graph[i].append([(i + 1, j + 1)])
+        return transfer_path_graph
+
+    def __transfer_student(self, path: list[tuple[int]], transfer_id_graph: list[list[int]]):
+        """Трансфер студента из одного электива в другой по пути трансферов."""
+        for transfer in path:
+            student = find_student(self.students, transfer_id_graph[transfer[0] - 1][transfer[1] - 1])
+            first_elective = find_elective(self.electives, transfer[0])
+            second_elective = find_elective(self.electives, transfer[1])
+            first_elective.delete_student(student)
+            second_elective.add_student(student)
 
 
-def get_student_transfer_graph(electives) -> (list[list[float]], list[list[int]]):
-    """Возвращает граф стоимости трансфера студентов с одного электива на другой и граф id этих студентов."""
-    number_of_electives = len(electives)
-    student_transfer_cost_graph = [[50. for _ in range(number_of_electives)] for _ in range(number_of_electives)]
-    student_transfer_id_graph = [[0 for _ in range(number_of_electives)] for _ in range(number_of_electives)]
+def is_possible_to_transfer_student(path: list[tuple[int]], cost: float) -> bool:
+    return len(path) != 1 and cost != inf
 
-    for elective in electives:
-        for student in elective.result_students:
-            for priority in student.priorities:
-                if elective.id != priority:
-                    transfer_cost = count_transfer_cost(student, elective.id, priority)
-                    if transfer_cost < student_transfer_cost_graph[elective.id - 1][priority - 1]:
-                        student_transfer_cost_graph[elective.id - 1][priority - 1] = round(-transfer_cost, 2)
-                        student_transfer_id_graph[elective.id - 1][priority - 1] = student.id
-                else:
-                    student_transfer_cost_graph[priority - 1][priority - 1] = 0.
-    return student_transfer_cost_graph, student_transfer_id_graph
+
+def find_student(students: list[Student], student_id: int) -> Student:
+    """Возвращает студента из списка по id."""
+    for student in students:
+        if student.id == student_id:
+            return student
+
+
+def adjust_transfer_graph(transfer_cost_graph: list[list[float]], transfer_path_graph: list[list[list[tuple]]], k: int):
+    """Корректирует граф трансфера, добавляя оптимальные трансферы студентов из i электива в j через k."""
+    number_of_electives = len(transfer_cost_graph)
+    for i in range(number_of_electives):
+        for j in range(number_of_electives):
+            new_transfer_cost = transfer_cost_graph[i][k] + transfer_cost_graph[k][j]
+            if transfer_cost_graph[i][j] > new_transfer_cost:
+                transfer_cost_graph[i][j] = new_transfer_cost
+                transfer_path_graph[i][j] = transfer_path_graph[i][k] + transfer_path_graph[k][j]
 
 
 def count_transfer_cost(student: Student, first_elective_id: int, second_elective_id: int) -> float:
@@ -64,17 +116,6 @@ def count_transfer_cost(student: Student, first_elective_id: int, second_electiv
     first_elective_position = student.get_elective_priority(first_elective_id)
     second_elective_position = student.get_elective_priority(second_elective_id)
     return student.performance * (first_elective_position - second_elective_position)
-
-
-def get_transfer_path_graph(student_transfer_cost_graph: list[list[float]]):
-    """??????????"""
-    number_of_electives = len(student_transfer_cost_graph)
-    transfer_path_graph = []
-    for i in range(number_of_electives):
-        transfer_path_graph.append([])
-        for j in range(number_of_electives):
-            transfer_path_graph[i].append([(i, j)])
-    return transfer_path_graph
 
 
 def equate_reserve_with_min_capacity(electives: list[Elective]):
