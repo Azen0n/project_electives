@@ -20,7 +20,11 @@ class StudentAllocator:
     def run(self):
         """Запуск алгоритма распределения студентов по элективам."""
         self.greedy_allocation()
+        call_all_metrics_clean(self.students)
         self.floyd_allocation()
+        call_all_metrics_clean(self.students)
+        self.remnant_allocation()
+        call_all_metrics_clean(self.students)
 
     def sort_electives_by_reserve(self):
         """Сортирует список элективов в порядке убывания резерва."""
@@ -28,9 +32,47 @@ class StudentAllocator:
 
     def greedy_allocation(self):
         """Запуск жадного алгоритма."""
-        equate_reserve_with_min_capacity(self.electives)
-        min_capacity_allocation(self.electives)
-        max_capacity_allocation(self.electives)
+        self.__equate_reserve_with_min_capacity()
+        self.__min_capacity_allocation()
+        self.__max_capacity_allocation()
+
+    def __equate_reserve_with_min_capacity(self):
+        """Заполняет элективы, которым не хватает несколько студентов до минимальной заполненности, студентами,
+        выбравшими его на второй и далее приоритеты, пока резерв не сравняется с минимальной вместимостью."""
+        for elective in self.electives:
+            if elective.is_potentially_completable():
+                elective.sort_students_by_priority(smart_students_first=False)
+                students = get_students_with_secondary_priorities(elective)
+                for student in students:
+                    if elective.is_completable():
+                        break
+                    first_priority_elective = self.__find_elective(student.priorities[0])
+                    if student.is_available() and is_first_priority_elective_available(first_priority_elective,
+                                                                                       elective):
+                        elective.reserve += 1
+                        first_priority_elective.reserve -= 1
+                        elective.add_student(student)
+                elective.sort_students_by_priority()
+
+    def __find_elective(self, elective_id: int) -> Elective:
+        """Возвращает электив из списка по id."""
+        for elective in self.electives:
+            if elective.id == elective_id:
+                return elective
+
+    def __min_capacity_allocation(self):
+        """Заполняет элективы, пока не будет достигнуто минимальное количество студентов в элективах."""
+        for elective in self.electives:
+            for student in elective.students:
+                if student.is_available() and not elective.is_min_completed() and elective.is_popular_enough():
+                    elective.add_student(student)
+
+    def __max_capacity_allocation(self):
+        """Полностью заполняет элективы студентами."""
+        for elective in self.electives:
+            for student in elective.students:
+                if student.is_available() and not elective.is_max_completed() and elective.is_popular_enough():
+                    elective.add_student(student)
 
     def floyd_allocation(self):
         """Запуск алгоритма Флойда."""
@@ -82,22 +124,52 @@ class StudentAllocator:
     def __transfer_student(self, path: list[tuple[int]], transfer_id_graph: list[list[int]]):
         """Трансфер студента из одного электива в другой по пути трансферов."""
         for transfer in path:
-            student = find_student(self.students, transfer_id_graph[transfer[0] - 1][transfer[1] - 1])
-            first_elective = find_elective(self.electives, transfer[0])
-            second_elective = find_elective(self.electives, transfer[1])
+            student = self.__find_student(transfer_id_graph[transfer[0] - 1][transfer[1] - 1])
+            first_elective = self.__find_elective(transfer[0])
+            second_elective = self.__find_elective(transfer[1])
             first_elective.delete_student(student)
             second_elective.add_student(student)
+
+    def __find_student(self, student_id: int) -> Student:
+        """Возвращает студента из списка по id."""
+        for student in self.students:
+            if student.id == student_id:
+                return student
+
+    def remnant_allocation(self):
+        """Запуск алгоритм распределения нераспределенных студентов."""
+        self.__greedy_remnant_allocation()
+        self.floyd_allocation()
+        self.__delete_misallocated_students()
+
+    def __greedy_remnant_allocation(self):
+        remnant_students = self.__get_remnant_students()
+        for elective in self.electives:
+            for i in range(elective.max_capacity - len(elective.result_students)):
+                if remnant_students:
+                    elective.add_student(remnant_students.pop(0))
+                else:
+                    break
+
+    def __delete_misallocated_students(self):
+        """Удаляет всех студентов, записанных не на один из выбранных элективов."""
+        for student in self.students:
+            if student.elective_id not in student.priorities:
+                elective = self.__find_elective(student.elective_id)
+                elective.delete_student(student)
+
+    def __get_remnant_students(self) -> list[Student]:
+        """Возвращает нераспределенных студентов, отсортированных по успеваемости."""
+        remnant_students = []
+        for student in self.students:
+            if student.is_available():
+                remnant_students.append(student)
+        remnant_students.sort(key=lambda student: 5 - student.performance)
+        return remnant_students
 
 
 def is_possible_to_transfer_student(path: list[tuple[int]], cost: float) -> bool:
     return len(path) != 1 and cost != inf
-
-
-def find_student(students: list[Student], student_id: int) -> Student:
-    """Возвращает студента из списка по id."""
-    for student in students:
-        if student.id == student_id:
-            return student
 
 
 def adjust_transfer_graph(transfer_cost_graph: list[list[float]], transfer_path_graph: list[list[list[tuple]]], k: int):
@@ -113,27 +185,9 @@ def adjust_transfer_graph(transfer_cost_graph: list[list[float]], transfer_path_
 
 def count_transfer_cost(student: Student, first_elective_id: int, second_elective_id: int) -> float:
     """Возвращает стоимость трансфера студента с одного электива на другой."""
-    first_elective_position = student.get_elective_priority(first_elective_id)
-    second_elective_position = student.get_elective_priority(second_elective_id)
+    first_elective_position = student.get_elective_position(first_elective_id)
+    second_elective_position = student.get_elective_position(second_elective_id)
     return student.performance * (first_elective_position - second_elective_position)
-
-
-def equate_reserve_with_min_capacity(electives: list[Elective]):
-    """Заполняет элективы, которым не хватает несколько студентов до минимальной заполненности, студентами,
-    выбравшими его на второй и далее приоритеты, пока резерв не сравняется с минимальной вместимостью."""
-    for elective in electives:
-        if elective.is_potentially_completable():
-            elective.sort_students_by_priority(smart_students_first=False)
-            students = get_students_with_secondary_priorities(elective)
-            for student in students:
-                if elective.is_completable():
-                    break
-                first_priority_elective = find_elective(electives, student.priorities[0])
-                if student.is_available() and is_first_priority_elective_available(first_priority_elective, elective):
-                    elective.reserve += 1
-                    first_priority_elective.reserve -= 1
-                    elective.add_student(student)
-            elective.sort_students_by_priority()
 
 
 def get_students_with_secondary_priorities(elective: Elective) -> list[Student]:
@@ -145,41 +199,20 @@ def get_students_with_secondary_priorities(elective: Elective) -> list[Student]:
     return secondary_students
 
 
-def find_elective(electives: list[Elective], elective_id: int) -> Elective:
-    """Возвращает электив из списка по id."""
-    for elective in electives:
-        if elective.id == elective_id:
-            return elective
-
-
 def is_first_priority_elective_available(first_priority_elective: Elective, current_elective: Elective) -> bool:
     """Первый выбранный студентом электив сможет заполниться, если записать студента на другой электив."""
     return first_priority_elective.reserve > current_elective.min_capacity > current_elective.reserve
-
-
-def min_capacity_allocation(electives: list[Elective]):
-    """Заполняет элективы, пока не будет достигнуто минимальное количество студентов в элективах."""
-    for elective in electives:
-        for student in elective.students:
-            if student.is_available() and not elective.is_min_completed() and elective.is_popular_enough():
-                elective.add_student(student)
-
-
-def max_capacity_allocation(electives: list[Elective]):
-    """Полностью заполняет элективы студентами."""
-    for elective in electives:
-        for student in elective.students:
-            if student.is_available() and not elective.is_max_completed() and elective.is_popular_enough():
-                elective.add_student(student)
 
 
 def main():
     electives = get_electives().tolist()
     students = get_students().tolist()
 
+    print(f'{len(electives) = }')
+    print(f'{len(students) = }')
+
     allocator = StudentAllocator(electives, students)
     allocator.run()
-    call_all_metrics_clean(allocator.students)
 
 
 if __name__ == '__main__':
