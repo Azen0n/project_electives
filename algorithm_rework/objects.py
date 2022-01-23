@@ -26,9 +26,13 @@ class Elective:
     min_capacity: int = 10
     reserve: int = 0  # Количество первых приоритетов
 
-    def add_student(self, student):
+    def add_student(self, student: Student):
         student.elective_id = self.id
         self.result_students.append(student)
+
+    def delete_student(self, student: Student):
+        student.elective_id = None
+        self.result_students.remove(student)
 
     def fill(self, students: list[Student]):
         """Заполняет список студентов, выбравших электив на один из приоритетов и подсчитывает резерв."""
