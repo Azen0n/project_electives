@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from math import inf
-from time import time
 
 from algorithm.db_queries.clean_test import get_electives, get_students
-from algorithm_rework.metrics import get_allocation_quality
+from algorithm_rework.metrics import get_allocation_quality, get_priority_distribution, get_mean_priority
 from algorithm_rework.tests import test_students, test_electives
 from objects import Elective, Student
 
@@ -29,6 +28,8 @@ class StudentAllocator:
 
         self.remnant_allocation()
         print(f'Remnant Allocation quality: {get_allocation_quality(self.students)}')
+        print(f'Remnant Allocation priority distribution: {get_priority_distribution(self.students)}')
+        print(f'Remnant Allocation mean priority: {get_mean_priority(self.students)}')
 
     def sort_electives_by_reserve(self):
         """Сортирует список элективов в порядке убывания резерва."""
@@ -219,8 +220,8 @@ def main():
     allocator = StudentAllocator(electives, students)
     allocator.run()
 
-    test_students(allocator)
-    test_electives(allocator)
+    test_students(allocator.students)
+    test_electives(allocator.electives)
 
 
 if __name__ == '__main__':
