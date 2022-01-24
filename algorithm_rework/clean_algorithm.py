@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from math import inf
+from time import time
 
 from algorithm.db_queries.clean_test import get_electives, get_students
+from algorithm_rework.metrics import get_allocation_quality
+from algorithm_rework.tests import test_students, test_electives
 from objects import Elective, Student
-from algorithm.metrics import call_all_metrics_clean
 
 
 @dataclass
@@ -20,11 +22,13 @@ class StudentAllocator:
     def run(self):
         """Запуск алгоритма распределения студентов по элективам."""
         self.greedy_allocation()
-        call_all_metrics_clean(self.students)
+        print(f'Greedy Allocation quality: {get_allocation_quality(self.students)}')
+
         self.floyd_allocation()
-        call_all_metrics_clean(self.students)
+        print(f'Floyd Allocation quality: {get_allocation_quality(self.students)}')
+
         self.remnant_allocation()
-        call_all_metrics_clean(self.students)
+        print(f'Remnant Allocation quality: {get_allocation_quality(self.students)}')
 
     def sort_electives_by_reserve(self):
         """Сортирует список элективов в порядке убывания резерва."""
@@ -47,8 +51,7 @@ class StudentAllocator:
                     if elective.is_completable():
                         break
                     first_priority_elective = self.__find_elective(student.priorities[0])
-                    if student.is_available() and is_first_priority_elective_available(first_priority_elective,
-                                                                                       elective):
+                    if student.is_available() and is_first_priority_elective_available(first_priority_elective, elective):
                         elective.reserve += 1
                         first_priority_elective.reserve -= 1
                         elective.add_student(student)
@@ -64,14 +67,14 @@ class StudentAllocator:
         """Заполняет элективы, пока не будет достигнуто минимальное количество студентов в элективах."""
         for elective in self.electives:
             for student in elective.students:
-                if student.is_available() and not elective.is_min_completed() and elective.is_popular_enough():
+                if student.is_available() and not elective.is_min_completed() and elective.is_completable():
                     elective.add_student(student)
 
     def __max_capacity_allocation(self):
         """Полностью заполняет элективы студентами."""
         for elective in self.electives:
             for student in elective.students:
-                if student.is_available() and not elective.is_max_completed() and elective.is_popular_enough():
+                if student.is_available() and not elective.is_max_completed() and elective.is_completable():
                     elective.add_student(student)
 
     def floyd_allocation(self):
@@ -137,12 +140,13 @@ class StudentAllocator:
                 return student
 
     def remnant_allocation(self):
-        """Запуск алгоритм распределения нераспределенных студентов."""
+        """Запуск алгоритма распределения нераспределенных студентов."""
         self.__greedy_remnant_allocation()
         self.floyd_allocation()
         self.__delete_misallocated_students()
 
     def __greedy_remnant_allocation(self):
+        """Распределение нераспределенных студентов на любые незаполненные элективы без учета приоритетов."""
         remnant_students = self.__get_remnant_students()
         for elective in self.electives:
             for i in range(elective.max_capacity - len(elective.result_students)):
@@ -152,11 +156,15 @@ class StudentAllocator:
                     break
 
     def __delete_misallocated_students(self):
-        """Удаляет всех студентов, записанных не на один из выбранных элективов."""
+        """Удаляет всех студентов, записанных на чужой или незаполнившийся электив."""
         for student in self.students:
             if student.elective_id not in student.priorities:
                 elective = self.__find_elective(student.elective_id)
                 elective.delete_student(student)
+        for elective in self.electives:
+            if len(elective.result_students) < elective.min_capacity:
+                for student in elective.result_students:
+                    elective.delete_student(student)
 
     def __get_remnant_students(self) -> list[Student]:
         """Возвращает нераспределенных студентов, отсортированных по успеваемости."""
@@ -208,11 +216,11 @@ def main():
     electives = get_electives().tolist()
     students = get_students().tolist()
 
-    print(f'{len(electives) = }')
-    print(f'{len(students) = }')
-
     allocator = StudentAllocator(electives, students)
     allocator.run()
+
+    test_students(allocator)
+    test_electives(allocator)
 
 
 if __name__ == '__main__':
