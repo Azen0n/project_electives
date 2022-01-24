@@ -10,8 +10,8 @@ from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import RiseInTransition, SlideTransition, NoTransition
 from kivy_garden.draggable import KXDraggableBehavior
 
-import algorithm
 import database_access
+from student_allocator import main
 from components import IconButton, MenuButton
 from extended_screen_manager import ExtendedScreenManager
 
@@ -212,7 +212,7 @@ class Statistics(BoxLayout):
 class Algorithm(RelativeLayout):
     @staticmethod
     def start_distribution():
-        algorithm.distribution()
+        main()
 
 
 class Authentication(RelativeLayout):

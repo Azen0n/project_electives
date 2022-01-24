@@ -1,29 +1,6 @@
 import numpy as np
 
-
-class Elective:
-    def __init__(self, id, capacity, students, day):
-        self.id = id
-        self.capacity = capacity  # Максимальная вместимость
-        self.students = students  # Список всех студентов, выбравших этот электив
-        self.result_students = []  # Финальный список студентов электива
-        self.reserve = 0  # Количество первых приоритетов в запасе
-        self.day = day  # День недели
-
-    def __repr__(self):
-        return f'id: {self.id}, capacity: {self.capacity}, students: {self.students}, day: {self.day}'
-
-
-class Student:
-    def __init__(self, id, performance, priorities):
-        self.id = id
-        self.performance = performance
-        self.priorities = priorities
-        self.elective_id = None
-        self.is_available = True
-
-    def __repr__(self):
-        return f'id: {self.id}, performance: {self.performance}, priorities: {self.priorities}'
+from objects import Elective, Student
 
 
 def generate_students_priorities(number_of_students, number_of_electives, distribution):

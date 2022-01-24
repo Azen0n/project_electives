@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from math import inf
 
-from algorithm.db_queries.clean_test import get_electives, get_students
-from algorithm_rework.metrics import get_allocation_quality, get_priority_distribution, get_mean_priority
-from algorithm_rework.tests import test_students, test_electives
+from db_queries import get_electives, get_students
+from metrics import get_allocation_quality, get_priority_distribution, get_mean_priority
+from tests import test_students, test_electives
 from objects import Elective, Student
 
 
@@ -214,8 +214,8 @@ def is_first_priority_elective_available(first_priority_elective: Elective, curr
 
 
 def main():
-    electives = get_electives().tolist()
-    students = get_students().tolist()
+    electives = get_electives()
+    students = get_students()
 
     allocator = StudentAllocator(electives, students)
     allocator.run()

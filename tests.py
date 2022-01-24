@@ -1,4 +1,4 @@
-from algorithm_rework.objects import Student, Elective
+from objects import Student, Elective
 
 
 def test_students(students: list[Student]):

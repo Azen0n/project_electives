@@ -1,18 +1,15 @@
 import psycopg2 as pg
-from data import generate_students, generate_electives
+from data_generation import generate_students, generate_electives
 
 if __name__ == '__main__':
-    with open('connection_string.txt') as f:
-        CONNECTION_STRING = f.readlines()[0]
-
-    connection = pg.connect(CONNECTION_STRING)
+    connection = pg.connect(host='localhost', user='postgres', password='nGr5DE&VctB2+=N8kBHb#JcY#W9xdBSR', dbname='test')
     cur = connection.cursor()
 
     sql = 'truncate Directions;'
     cur.execute(sql)
 
-    number_of_students = 800
-    number_of_electives = 40
+    number_of_students = 500
+    number_of_electives = 60
 
     students = generate_students(number_of_students, number_of_electives, distribution='gamma')
     electives = generate_electives(number_of_electives, 20, 25)

@@ -1,4 +1,4 @@
-from algorithm_rework.objects import Student
+from objects import Student
 
 
 def get_mean_priority(students: list[Student]) -> float:

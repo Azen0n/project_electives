@@ -1,6 +1,6 @@
 import psycopg2
 
-connection = psycopg2.connect(host='localhost', user='postgres', password='12345', dbname='electives')
+connection = psycopg2.connect(host='localhost', user='postgres', password='nGr5DE&VctB2+=N8kBHb#JcY#W9xdBSR', dbname='electives')
 cursor = connection.cursor()
 
 
